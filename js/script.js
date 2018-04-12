@@ -6,48 +6,37 @@
 //TODO Generate map based on url
 //IF no URL, generate map based on user's location
 
-var myViewModel = {
-    ellipsesText: ko.observable('')
+var viewmodelLoading = {
+    ellipsesText: ko.observable('...')
 };
-ko.applyBindings(myViewModel);
+ko.applyBindings(viewmodelLoading);
 
-function showLoading(currentEllipses) {
-    var defaultEllipses = 3;
-    var oldEllipses;
-    if(currentEllipses){
-        oldEllipses = currentEllipses;
-    }else{
-        oldEllipses = defaultEllipses;
-    }
-    var newEllipses = oldEllipses % 3;
-    newEllipses++;
-    var ellipsesString = "..."
-    switch(newEllipses){
-        case 1:
-            ellipsesString = ".";
+function showLoading(observableEllipses) {
+    // Accepts a KO observable input and increments it every half-second from "."
+    // to ".." to "..."
+    switch(observableEllipses()){
+        case "...":
+            observableEllipses(".");
             break;
-        case 2:
-            ellipsesString = "..";
+        case ".":
+            observableEllipses("..");
             break;
-        case 3:
-            ellipsesString = "...";
+        case "..":
+            observableEllipses("...");
             break;
         default:
             console.log("Error in showLoading().");
             break;
     }
     var showLoadingWithParameter = function(){
-        showLoading(newEllipses);
+        showLoading(observableEllipses);
     };
-    myViewModel.ellipsesText(ellipsesString);
-    console.log(myViewModel.ellipsesText);
     setTimeout(showLoadingWithParameter, 500);
 }
 
-var loadWorker = new Worker(showLoading.call(loadWorker));
+var loadWorker = new Worker(showLoading(viewmodelLoading.ellipsesText));
 
-loadWorker.onmessage = function (e) {
-    console.log(this);
-}
+
+
 
 //loadWorker.terminate();
