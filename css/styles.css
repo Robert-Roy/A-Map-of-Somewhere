@@ -14,15 +14,16 @@ body, html{
     height:100%;
 }
 
-.center-vertically{
-    position: relative;
-    top:50%;
-    -webkit-transform: translate(0, -50%);
-    -ms-transform: translate(0, -50%);
-    transform: translate(0, -50%);
+.max-width{
+    width:100%;
+    padding:0;
+    margin:0;
 }
 
-.row-loading-text{
-    position: relative;
-    top:40%;
+.no-magin{
+    margin:0;
+}
+
+.no-padding{
+    padding:0;
 }

@@ -7,17 +7,29 @@ All rights reserved. Copyright Robert Roy 2017.
         <title>A Map of Nowhere</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="css/styles.css">
         <link rel="stylesheet" href="css/bootstrap.min.css">
-        <script src="jquery-3.3.1.min.js"></script>
+        <link rel="stylesheet" href="css/styles.css">
+        <script src="js/lib/jquery-3.3.1.min.js"></script>
         <script src="js/lib/knockout-3.4.2.js"></script>
         <script async src="js/script.js"></script>
+        <!-- This callback isn't used yet -->
+        <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk22YlIlQNnNOM93_oqrR4vy6cCnVCbpI&v=3&callback=activateMaps">
+        </script>
     </head>
     <body>
-        <div class="container max-height">
-            <div class="row row-loading-text">
-                <div class="col-md-12 text-center">
+        <div class="container container-fluid max-height max-width no-margin no-padding">
+            <!--            <div class="row row-loading-text">
+                            <div class="col-md-12 text-center">
+                                <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>
+                            </div>
+                        </div>-->
+            <div class="row max-height max-width no-margin no-padding">
+                <div id="loading-text" class="col-md-12 text-center">
                     <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>
+                </div>
+                <div class="col-md-12 max-height no-margin no-padding">
+                    <div id="map" class="max-height no-margin no-padding"></div>
                 </div>
             </div>
         </div>
