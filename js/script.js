@@ -61,12 +61,17 @@ var modelMap = {
 }
 
 var map;
-// uses the ipify API. For API usage, https://www.ipify.org/.
+// uses the ipapi.co API. For API usage, https://ipapi.co/.
 //TODO needs a timeout failsafe, on badURL will not get a success or failure
-$.get("http://ip-api.com/json", function (data) {
+
+// IP api is a neat API, but it does not support https, so it is a security issue and
+// this is blocked by every modern browser. As a result, I have had to abandon
+// This utility
+
+$.get("https://ipapi.co/json", function (data) {
     console.log(data.status);
     if (data.status === "success") {
-        drawMap(data.lat, data.lon);
+        drawMap(data.latitude, data.longitude);
     }
 });
 
