@@ -19,6 +19,8 @@ viewmodelLoading.startLoading = function () {
     viewmodelLoading.loadWorker = new Worker(viewmodelLoading.incrementEllipses(viewmodelLoading.ellipsesText));
 };
 viewmodelLoading.stopLoading = function () {
+    divLoadingText = document.getElementById("loading-text");
+    divLoadingText.outerHTML = "";
     viewmodelLoading.loadWorker.terminate();
 }
 //viewmodelLoading.stopLoading();
@@ -55,12 +57,89 @@ function showLoading(observableEllipses) {
 //TODO Generate map based on url
 //IF no URL, generate map based on user's location
 
-var modelMap = {
+var viewmodelMap = {
     map: null,
-    mapsAPIActive: false
+    mapsAPIActive: false,
+    mapWorker: new Worker(null),
+    pendingGeolocation: false,
+    geolocationError: false,
+    successFunction: function () {} // function called when a map is drawn
 }
+viewmodelMap.create = function () {
+    // If asked to create itself without latitude and longitude set, it will attempt to use
+    // geolocation to do so. If latitude and longitude are set, it will use those
+    // 
+    // so I can recurse with a timeout while keeping "this" intact.
+    var that = this;
+    var recurse = function () {
+        that.create();
+    }
 
-var map;
+    // verify that google maps api is active
+    if (!this.mapsAPIActive) {
+        //wait for google maps API to be active before proceeding
+        console.log("Maps not active... Waiting.");
+        setTimeout(recurse, 100);
+        return;
+    }
+
+    // check if a valid latitude and longitude have been established
+    if (validLatLng(this.latitude, this.longitude)) {
+        // Draw the map
+        console.log("trying to draw map");
+        drawMap(this.latitude, this.longitude);
+        this.successFunction();
+        return;
+    }
+    // Check if we are currently waiting on geolocation
+    if (!this.pendingGeolocation) {
+        // if not, start getting location
+        console.log("trying to get location");
+        // Note that we are now waiting for geolocation
+        this.pendingGeolocation = true;
+        // Start trying to get user location
+        this.mapWorker = new Worker(this.getUserLocation());
+        // Recurse to wait for geolocation or time-out
+        setTimeout(recurse, 100);
+        return;
+    } else {
+        // we are waiting for geolocation
+        if (this.geolocationError) {
+            // An error has occurred with geolocation
+            // TODO: do something.
+        }
+        //TODO: Timeout on this after X time
+        // wait 1/10th of a second and check again
+        setTimeout(recurse, 100);
+        return;
+    }
+}
+viewmodelMap.getUserLocation = function () {
+    var that = this;
+    var callSetLocation = function (position) {
+        that.setLocation(position);
+    }
+    var callError = function () {
+        that.errorGettingUserLocation();
+    }
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(callSetLocation, callError);
+    } else {
+        //browser doesn't support geolocation
+        viewmodelMap.errorGettingUserLocation();
+    }
+
+}
+viewmodelMap.errorGettingUserLocation = function () {
+    console.log("Couldn't find him, boss!");
+}
+viewmodelMap.setLocation = function (position) {
+    this.latitude = position.coords.latitude;
+    this.longitude = position.coords.longitude;
+}
+viewmodelMap.successFunction = viewmodelLoading.stopLoading;
+viewmodelMap.create();
+
 // uses the ipapi.co API. For API usage, https://ipapi.co/.
 //TODO needs a timeout failsafe, on badURL will not get a success or failure
 
@@ -68,46 +147,15 @@ var map;
 // this is blocked by every modern browser. As a result, I have had to abandon
 // This utility
 
-$.get("https://ipapi.co/json", function (data) {
-    console.log(data.status);
-    if (data.status === "success") {
-        drawMap(data.latitude, data.longitude);
-    }
-});
-
-//jQuery.getJSON("http://ip-api.com/json/$IP");
-//loadWorker.terminate();
-
 function activateMaps() {
-    modelMap.mapsAPIActive = true;
+    viewmodelMap.mapsAPIActive = true;
 }
-;
-function readyToDrawMaps() {
-    return modelMap.mapsAPIActive;
-}
-
 function drawMap(latitude, longitude) {
-    //TODO: What if we're not ready to draw maps yet? What if we don't become ready?
-    //TODO: What if Lat/Long doesn't work? How would we know? What if city is no good?
-    if (!readyToDrawMaps()) {
-        // TODO should recurse with timeout.
-        return null;
-    }
-    if (validLatLng(latitude, longitude)) {
-        console.log("trying to draw map");
-        divLoadingText = document.getElementById("loading-text");
-        divLoadingText.outerHTML = "";
-        viewmodelLoading.stopLoading();
-        modelMap.map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: latitude, lng: longitude},
-            zoom: 13
-        });
-    }
-    else{
-        
-    }
+    viewmodelMap.map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: latitude, lng: longitude},
+        zoom: 13
+    });
 }
-
 function validLatLng(latitude, longitude) {
     // verify that lat long are numbers
     if (typeof latitude === "number" && typeof longitude === "number") {
@@ -118,12 +166,4 @@ function validLatLng(latitude, longitude) {
         }
     }
     return false;
-}
-
-function initMap() {
-    // Constructor creates a new map - only center and zoom are required.
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: 40.7413549, lng: -73.9980244},
-        zoom: 13
-    });
 }
