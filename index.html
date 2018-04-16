@@ -11,8 +11,7 @@ All rights reserved. Copyright Robert Roy 2017.
         <link rel="stylesheet" href="css/styles.css">
         <script src="js/lib/jquery-3.3.1.min.js"></script>
         <script src="js/lib/knockout-3.4.2.js"></script>
-        <script async src="js/script.js"></script>
-        <!-- This callback isn't used yet -->
+        <script defer src="js/script.js"></script>
         <script async defer
                 src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk22YlIlQNnNOM93_oqrR4vy6cCnVCbpI&v=3&callback=activateMaps">
         </script>
@@ -25,7 +24,7 @@ All rights reserved. Copyright Robert Roy 2017.
                             </div>
                         </div>-->
             <div class="row max-height max-width no-margin no-padding">
-                <div id="loading-text" class="col-md-12 text-center">
+                <div id="loading-text" class="col-md-12 text-center loading-text-centered">
                     <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>
                 </div>
                 <div class="col-md-12 max-height no-margin no-padding">

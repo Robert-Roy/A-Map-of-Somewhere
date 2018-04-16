@@ -63,13 +63,20 @@ var viewmodelMap = {
     mapWorker: new Worker(null),
     pendingGeolocation: false,
     geolocationError: false,
-    successFunction: function () {} // function called when a map is drawn
+    successFunction: function () {}, // function called when a map is drawn
+    failureFunction: function () {}, // function called when an error or timeout occurs that prevents map drawing
+    timeoutAfterMS: 10000,
+    startTime: null
 }
 viewmodelMap.create = function () {
     // If asked to create itself without latitude and longitude set, it will attempt to use
     // geolocation to do so. If latitude and longitude are set, it will use those
     // 
     // so I can recurse with a timeout while keeping "this" intact.
+    if(this.startTime === null){
+        console.log("setting new startTime");
+        this.startTime = new Date().getTime();
+    }
     var that = this;
     var recurse = function () {
         that.create();
@@ -105,10 +112,19 @@ viewmodelMap.create = function () {
     } else {
         // we are waiting for geolocation
         if (this.geolocationError) {
-            // An error has occurred with geolocation
-            // TODO: do something.
+            console.log("An error was encountered when attempting geolocation");
+            // call set failure function
+            this.failureFunction();
+            // stop recursing
+            return;
         }
-        //TODO: Timeout on this after X time
+        // Check if we have waited too long (timeoutAfterMS milliseconds). Throw error if we have.
+        console.log(this.startTime + this.timeoutAfterMS - new Date().getTime());
+        if(this.startTime + this.timeoutAfterMS < new Date().getTime()){
+            console.log("It took too long to get the user's location.");
+            this.errorGettingUserLocation();
+            this.failureFunction();
+        } 
         // wait 1/10th of a second and check again
         setTimeout(recurse, 100);
         return;
@@ -132,12 +148,15 @@ viewmodelMap.getUserLocation = function () {
 }
 viewmodelMap.errorGettingUserLocation = function () {
     console.log("Couldn't find him, boss!");
+    this.geolocationError = true;
 }
 viewmodelMap.setLocation = function (position) {
     this.latitude = position.coords.latitude;
     this.longitude = position.coords.longitude;
 }
+
 viewmodelMap.successFunction = viewmodelLoading.stopLoading;
+//TODO: Failurefunction
 viewmodelMap.create();
 
 // uses the ipapi.co API. For API usage, https://ipapi.co/.

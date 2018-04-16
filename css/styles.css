@@ -27,3 +27,8 @@ body, html{
 .no-padding{
     padding:0;
 }
+
+.loading-text-centered{
+    position:relative;
+    top:40%;
+}
