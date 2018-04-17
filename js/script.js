@@ -12,23 +12,28 @@
 
 var viewmodelLoading = {
     ellipsesText: ko.observable('...'),
-    incrementEllipses: showLoading,
-    loadWorker: new Worker(null)
+    loadWorker: new Worker(null),
+    active: false
 };
 viewmodelLoading.startLoading = function () {
-    viewmodelLoading.loadWorker = new Worker(viewmodelLoading.incrementEllipses(viewmodelLoading.ellipsesText));
+    this.active = true;
+    this.incrementEllipses(this.ellipsesText);
 };
 viewmodelLoading.stopLoading = function () {
-    divLoadingText = document.getElementById("loading-text");
-    divLoadingText.outerHTML = "";
-    viewmodelLoading.loadWorker.terminate();
+    this.active = false;
 }
 //viewmodelLoading.stopLoading();
 ko.applyBindings(viewmodelLoading);
-viewmodelLoading.startLoading();
-function showLoading(observableEllipses) {
+viewmodelLoading.incrementEllipses = function (observableEllipses) {
     // Accepts a KO observable input and increments it every half-second from "."
     // to ".." to "..."
+
+    // this will stop recursion if loading is no longer active.
+    if(!this.active){
+        return;
+    }
+    console.log("still alive");
+    that = this;
     switch (observableEllipses()) {
         case "...":
             observableEllipses(".");
@@ -43,11 +48,11 @@ function showLoading(observableEllipses) {
             console.log("Error in showLoading().");
             break;
     }
-    var showLoadingWithParameter = function () {
-        showLoading(observableEllipses);
+    var incrementEllipsesWithParameter = function () {
+        that.incrementEllipses(observableEllipses);
     };
-    setTimeout(showLoadingWithParameter, 500);
-}
+    setTimeout(incrementEllipsesWithParameter, 500);
+};
 
 //////////////////
 //////////////////
@@ -55,12 +60,12 @@ function showLoading(observableEllipses) {
 //////////////////
 //////////////////
 //TODO Generate map based on url
+//TODO: Failurefunction
 //IF no URL, generate map based on user's location
 
 var viewmodelMap = {
     map: null,
     mapsAPIActive: false,
-    mapWorker: new Worker(null),
     pendingGeolocation: false,
     geolocationError: false,
     successFunction: function () {}, // function called when a map is drawn
@@ -73,7 +78,7 @@ viewmodelMap.create = function () {
     // geolocation to do so. If latitude and longitude are set, it will use those
     // 
     // so I can recurse with a timeout while keeping "this" intact.
-    if(this.startTime === null){
+    if (this.startTime === null) {
         console.log("setting new startTime");
         this.startTime = new Date().getTime();
     }
@@ -94,6 +99,7 @@ viewmodelMap.create = function () {
     if (validLatLng(this.latitude, this.longitude)) {
         // Draw the map
         console.log("trying to draw map");
+        this.pendingGeolocation = false;
         drawMap(this.latitude, this.longitude);
         this.successFunction();
         return;
@@ -105,30 +111,25 @@ viewmodelMap.create = function () {
         // Note that we are now waiting for geolocation
         this.pendingGeolocation = true;
         // Start trying to get user location
-        this.mapWorker = new Worker(this.getUserLocation());
+        this.getUserLocation();
         // Recurse to wait for geolocation or time-out
         setTimeout(recurse, 100);
         return;
-    } else {
-        // we are waiting for geolocation
-        if (this.geolocationError) {
-            console.log("An error was encountered when attempting geolocation");
-            // call set failure function
-            this.failureFunction();
-            // stop recursing
-            return;
-        }
-        // Check if we have waited too long (timeoutAfterMS milliseconds). Throw error if we have.
-        console.log(this.startTime + this.timeoutAfterMS - new Date().getTime());
-        if(this.startTime + this.timeoutAfterMS < new Date().getTime()){
-            console.log("It took too long to get the user's location.");
-            this.errorGettingUserLocation();
-            this.failureFunction();
-        } 
-        // wait 1/10th of a second and check again
-        setTimeout(recurse, 100);
+    }
+    if (this.geolocationError) {
+        // if for some reason an error was encountered, stop looping.
         return;
     }
+    // Check if we have waited too long (timeoutAfterMS milliseconds). Throw error if we have.
+    console.log("Waiting for user location. " + (this.startTime + this.timeoutAfterMS - new Date().getTime()) + "ms remaining");
+    if (this.startTime + this.timeoutAfterMS < new Date().getTime()) {
+        console.log("It took too long to get the user's location.");
+        this.errorGettingUserLocation();
+        return;
+    }
+    // wait 1/10th of a second and check again
+    setTimeout(recurse, 100);
+    return;
 }
 viewmodelMap.getUserLocation = function () {
     var that = this;
@@ -147,26 +148,16 @@ viewmodelMap.getUserLocation = function () {
 
 }
 viewmodelMap.errorGettingUserLocation = function () {
-    console.log("Couldn't find him, boss!");
+    console.log("Unable to geolocate user.");
     this.geolocationError = true;
+    this.failureFunction();
 }
 viewmodelMap.setLocation = function (position) {
     this.latitude = position.coords.latitude;
     this.longitude = position.coords.longitude;
 }
-
-viewmodelMap.successFunction = viewmodelLoading.stopLoading;
-//TODO: Failurefunction
-viewmodelMap.create();
-
-// uses the ipapi.co API. For API usage, https://ipapi.co/.
-//TODO needs a timeout failsafe, on badURL will not get a success or failure
-
-// IP api is a neat API, but it does not support https, so it is a security issue and
-// this is blocked by every modern browser. As a result, I have had to abandon
-// This utility
-
 function activateMaps() {
+    //callback from google maps activation
     viewmodelMap.mapsAPIActive = true;
 }
 function drawMap(latitude, longitude) {
@@ -186,3 +177,29 @@ function validLatLng(latitude, longitude) {
     }
     return false;
 }
+
+//////////////////
+//////////////////
+// Active Section
+//////////////////
+//////////////////
+
+function handleMapFailure(){
+    divLoadingText = document.getElementById("loading-text");
+    divLoadingText.innerHTML = "<h1>An error occurred while attempting to geolocate you.<br>Please <a href=index.html>try again</a>.</h1>";
+}
+function handleMapSuccess(){
+    viewmodelLoading.stopLoading();
+    divLoadingText = document.getElementById("loading-text");
+    divLoadingText.outerHTML = "";
+    divMap = document.getElementById("map-column");
+    console.log(divMap);
+    divMap.classList.remove("no-display");
+}
+
+viewmodelLoading.startLoading();
+viewmodelMap.successFunction = function () {
+    handleMapSuccess();
+};
+viewmodelMap.failureFunction = handleMapFailure;
+viewmodelMap.create();

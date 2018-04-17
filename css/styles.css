@@ -32,3 +32,7 @@ body, html{
     position:relative;
     top:40%;
 }
+
+.no-display{
+    display:none;
+}
