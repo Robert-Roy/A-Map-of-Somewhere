@@ -29,7 +29,7 @@ viewmodelLoading.incrementEllipses = function (observableEllipses) {
     // to ".." to "..."
 
     // this will stop recursion if loading is no longer active.
-    if(!this.active){
+    if (!this.active) {
         return;
     }
     console.log("still alive");
@@ -134,7 +134,9 @@ viewmodelMap.create = function () {
 viewmodelMap.getUserLocation = function () {
     var that = this;
     var callSetLocation = function (position) {
-        that.setLocation(position);
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+        that.setLocation(latitude, longitude);
     }
     var callError = function () {
         that.errorGettingUserLocation();
@@ -152,9 +154,9 @@ viewmodelMap.errorGettingUserLocation = function () {
     this.geolocationError = true;
     this.failureFunction();
 }
-viewmodelMap.setLocation = function (position) {
-    this.latitude = position.coords.latitude;
-    this.longitude = position.coords.longitude;
+viewmodelMap.setLocation = function (latitude, longitude) {
+    this.latitude = latitude;
+    this.longitude = longitude;
 }
 function activateMaps() {
     //callback from google maps activation
@@ -163,7 +165,8 @@ function activateMaps() {
 function drawMap(latitude, longitude) {
     viewmodelMap.map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: latitude, lng: longitude},
-        zoom: 13
+        zoom: 13,
+        mapTypeControl: false
     });
 }
 function validLatLng(latitude, longitude) {
@@ -177,6 +180,47 @@ function validLatLng(latitude, longitude) {
     }
     return false;
 }
+function searchMap() {
+    mapLocation = new google.maps.LatLng(viewmodelMap.latitude, viewmodelMap.longitude);
+    console.log("1");
+    var searchQuery = {
+        location: mapLocation,
+        radius: 6000,
+        type: ['restaurant']
+    }
+    console.log("2");
+    service = new google.maps.places.PlacesService(viewmodelMap.map);
+    console.log("3");
+    service.nearbySearch(searchQuery, drawResults);
+    console.log("4");
+}
+function drawResults(results, status) {
+    if (status == google.maps.places.PlacesServiceStatus.OK) {
+        console.log("1");
+        for (var i = 0; i < results.length; i++) {
+            console.log("2");
+            console.log(results[i]);
+            createMarker(results[i]);
+        }
+    } else {
+        // TODO: Something went wrong with the search, handle it.
+    }
+}
+function createMarker(place) {
+    var location = place.geometry.location;
+    var marker = new google.maps.Marker({
+        map: viewmodelMap.map,
+        position: place.geometry.location
+    });
+    var infowindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(marker, 'click', function () {
+        infowindow.setContent(place.name);
+        infowindow.open(viewmodelMap.map, this);
+    });
+}
+
+
+
 
 //////////////////
 //////////////////
@@ -184,22 +228,26 @@ function validLatLng(latitude, longitude) {
 //////////////////
 //////////////////
 
-function handleMapFailure(){
+function handleMapFailure() {
     divLoadingText = document.getElementById("loading-text");
     divLoadingText.innerHTML = "<h1>An error occurred while attempting to geolocate you.<br>Please <a href=index.html>try again</a>.</h1>";
 }
-function handleMapSuccess(){
+function handleMapSuccess() {
+    // remove loading text and set map to forefront
     viewmodelLoading.stopLoading();
     divLoadingText = document.getElementById("loading-text");
     divLoadingText.outerHTML = "";
     divMap = document.getElementById("map-column");
     console.log(divMap);
     divMap.classList.remove("no-display");
+    // draw locations on map
+    setTimeout(searchMap, 2000);
 }
 
 viewmodelLoading.startLoading();
 viewmodelMap.successFunction = function () {
     handleMapSuccess();
-};
+}
+;
 viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
