@@ -12,7 +12,6 @@
 
 var viewmodelLoading = {
     ellipsesText: ko.observable('...'),
-    loadWorker: new Worker(null),
     active: false
 };
 viewmodelLoading.startLoading = function () {
@@ -158,6 +157,9 @@ viewmodelMap.setLocation = function (latitude, longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
 }
+
+var modelPlace = [];
+
 function activateMaps() {
     //callback from google maps activation
     viewmodelMap.mapsAPIActive = true;
@@ -182,26 +184,22 @@ function validLatLng(latitude, longitude) {
 }
 function searchMap() {
     mapLocation = new google.maps.LatLng(viewmodelMap.latitude, viewmodelMap.longitude);
-    console.log("1");
     var searchQuery = {
         location: mapLocation,
         radius: 6000,
         type: ['restaurant']
     }
-    console.log("2");
     service = new google.maps.places.PlacesService(viewmodelMap.map);
-    console.log("3");
-    service.nearbySearch(searchQuery, drawResults);
-    console.log("4");
+    service.nearbySearch(searchQuery, handlePlacesSearch);
 }
-function drawResults(results, status) {
+function handlePlacesSearch(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
-        console.log("1");
         for (var i = 0; i < results.length; i++) {
-            console.log("2");
-            console.log(results[i]);
+            modelPlace.push(results[i]);
             createMarker(results[i]);
         }
+        sortPlaces();
+        updatePlacesList();
     } else {
         // TODO: Something went wrong with the search, handle it.
     }
@@ -219,6 +217,18 @@ function createMarker(place) {
     });
 }
 
+function sortPlaces(){
+    modelPlace.sort(function(a, b){
+        return a.name.localeCompare(b.name);
+    });
+}
+function updatePlacesList(){
+    var locationList = "";
+    for(var i = 0; i < modelPlace.length; i++){
+        locationList = locationList + "<li>" + modelPlace[i].name + "</li>";
+    }
+    document.getElementById("location-list").innerHTML = locationList;
+}
 
 
 
@@ -227,6 +237,7 @@ function createMarker(place) {
 // Active Section
 //////////////////
 //////////////////
+
 
 function handleMapFailure() {
     divLoadingText = document.getElementById("loading-text");
@@ -238,8 +249,9 @@ function handleMapSuccess() {
     divLoadingText = document.getElementById("loading-text");
     divLoadingText.outerHTML = "";
     divMap = document.getElementById("map-column");
-    console.log(divMap);
     divMap.classList.remove("no-display");
+    divLeftColumn = document.getElementById("hidden-column-left");
+    divLeftColumn.classList.remove("no-display");
     // draw locations on map
     setTimeout(searchMap, 2000);
 }
@@ -251,3 +263,10 @@ viewmodelMap.successFunction = function () {
 ;
 viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
+
+
+
+$(".hidden-column-left-hamburger").on('click touch', function(){
+    console.log("I'm trying, here");
+    $(this).parent().toggleClass("inactive");
+});
