@@ -8,7 +8,9 @@
 // LOADING SECTION
 //////////////////
 //////////////////
-//TODO: This really shouldn't display for the first second or so.
+
+// A knockout script to update ellipses from "." to ".." to "...", then back to "."
+// repeatedly so the user knows the page hasn't frozen.
 
 var viewmodelLoading = {
     ellipsesText: ko.observable('...'),
@@ -21,7 +23,6 @@ viewmodelLoading.startLoading = function () {
 viewmodelLoading.stopLoading = function () {
     this.active = false;
 }
-//viewmodelLoading.stopLoading();
 ko.applyBindings(viewmodelLoading);
 viewmodelLoading.incrementEllipses = function (observableEllipses) {
     // Accepts a KO observable input and increments it every half-second from "."
@@ -59,7 +60,6 @@ viewmodelLoading.incrementEllipses = function (observableEllipses) {
 //////////////////
 //////////////////
 //TODO Generate map based on url
-//TODO: Failurefunction
 //IF no URL, generate map based on user's location
 
 var viewmodelMap = {
@@ -99,7 +99,7 @@ viewmodelMap.create = function () {
         // Draw the map
         console.log("trying to draw map");
         this.pendingGeolocation = false;
-        drawMap(this.latitude, this.longitude);
+        this.drawMap();
         this.successFunction();
         return;
     }
@@ -157,19 +157,24 @@ viewmodelMap.setLocation = function (latitude, longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
 }
+viewmodelMap.drawMap = function () {
+    this.map = new google.maps.Map(document.getElementById('map'), {
+        center: {
+            lat: this.latitude,
+            lng: this.longitude
+        },
+        zoom: 13,
+        mapTypeControl: false
+    });
+
+}
 
 var modelPlace = [];
+var viewmodelPlacesList = [];
 
 function activateMaps() {
     //callback from google maps activation
     viewmodelMap.mapsAPIActive = true;
-}
-function drawMap(latitude, longitude) {
-    viewmodelMap.map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat: latitude, lng: longitude},
-        zoom: 13,
-        mapTypeControl: false
-    });
 }
 function validLatLng(latitude, longitude) {
     // verify that lat long are numbers
@@ -196,38 +201,75 @@ function handlePlacesSearch(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
             modelPlace.push(results[i]);
-            createMarker(results[i]);
+            modelPlace[i].marker = createMarker(modelPlace[i]);
+            addInfoWindow(modelPlace[i]);
         }
         sortPlaces();
         updatePlacesList();
+        for (var i = 0; i < modelPlace.length; i++) {
+            addWindowOpeningClickListenerToElement(modelPlace[i].infoWindow, modelPlace[i].marker, viewmodelPlacesList[i]);
+            addWindowOpeningClickListenerToMarker(modelPlace[i].infoWindow, modelPlace[i].marker);
+        }
+
     } else {
         // TODO: Something went wrong with the search, handle it.
     }
 }
 function createMarker(place) {
-    var location = place.geometry.location;
     var marker = new google.maps.Marker({
         map: viewmodelMap.map,
-        position: place.geometry.location
+        position: place.geometry.location,
+        animation: google.maps.Animation.DROP
     });
+    return marker;
+}
+function addInfoWindow(place) {
     var infowindow = new google.maps.InfoWindow();
+    var infowindowContent = "";
+    infowindowContent = infowindowContent + '<h5 class="">' + place.name + "</h5>";
+    if (place.opening_hours.open_now) {
+        infowindowContent = infowindowContent + "<p>Open Now</p>";
+    } else {
+        infowindowContent = infowindowContent + "<p>Currently Closed</p>";
+    }
+    infowindowContent = infowindowContent + "<p>" + place.vicinity + "</p>";
+    infowindow.setContent(infowindowContent);
+    place.infoWindow = infowindow;
+}
+function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
+    clickableObject.addEventListener('mouseover', function () {
+        console.log("I don't know, man");
+        infoWindow.open(viewmodelMap.map, marker);
+    }, false);
+    console.log(clickableObject);
+}
+function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
     google.maps.event.addListener(marker, 'click', function () {
-        infowindow.setContent(place.name);
-        infowindow.open(viewmodelMap.map, this);
+        infoWindow.open(viewmodelMap.map, this);
     });
 }
 
-function sortPlaces(){
-    modelPlace.sort(function(a, b){
+function sortPlaces() {
+    modelPlace.sort(function (a, b) {
         return a.name.localeCompare(b.name);
     });
 }
-function updatePlacesList(){
-    var locationList = "";
-    for(var i = 0; i < modelPlace.length; i++){
-        locationList = locationList + "<li>" + modelPlace[i].name + "</li>";
+function updatePlacesList() {
+    var locationList = document.getElementById("location-list");
+    for (var i = 0; i < modelPlace.length; i++) {
+        var newLocationListItem = document.createElement("div");
+        newLocationListItem.innerHTML = modelPlace[i].name;
+        viewmodelPlacesList.push(newLocationListItem);
+        locationList.appendChild(newLocationListItem);
+        locationList.innerHTML += "<hr class=no-margin>";
     }
-    document.getElementById("location-list").innerHTML = locationList;
+
+//    var locationList = "";
+//    for (var i = 0; i < modelPlace.length; i++) {
+//        locationList = locationList + "<li>" + modelPlace[i].name + "</li>";
+//        locationList = locationList + '<hr class="no-margin">';
+//    }
+//    document.getElementById("location-list").innerHTML = locationList;
 }
 
 
@@ -266,7 +308,6 @@ viewmodelMap.create();
 
 
 
-$(".hidden-column-left-hamburger").on('click touch', function(){
-    console.log("I'm trying, here");
+$(".hidden-column-left-hamburger").on('click touch', function () {
     $(this).parent().toggleClass("inactive");
 });

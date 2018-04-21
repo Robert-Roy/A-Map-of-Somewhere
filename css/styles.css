@@ -20,7 +20,7 @@ body, html{
     margin:0;
 }
 
-.no-magin{
+.no-margin{
     margin:0;
 }
 
@@ -86,8 +86,9 @@ body, html{
     margin-left:.5em;
     margin-top:.25em;
     margin-bottom:.25em;
+    margin-right:.5em;
 }
-#location-list>li{
-    margin-top:.25em;
-    margin-bottom:.25em;
+#location-list>div{
+    padding-top: .5em;
+    padding-bottom:.5em;
 }
