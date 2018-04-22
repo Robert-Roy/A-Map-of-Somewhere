@@ -237,10 +237,10 @@ function addInfoWindow(place) {
     place.infoWindow = infowindow;
 }
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
-    clickableObject.addEventListener('mouseover', function () {
+    clickableObject.addEventListener('click', function () {
         console.log("I don't know, man");
         infoWindow.open(viewmodelMap.map, marker);
-    }, false);
+    }, true);
     console.log(clickableObject);
 }
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
@@ -261,7 +261,9 @@ function updatePlacesList() {
         newLocationListItem.innerHTML = modelPlace[i].name;
         viewmodelPlacesList.push(newLocationListItem);
         locationList.appendChild(newLocationListItem);
-        locationList.innerHTML += "<hr class=no-margin>";
+        var hrElement = document.createElement("hr");
+        hrElement.className = "no-margin";
+        locationList.appendChild(hrElement);
     }
 
 //    var locationList = "";
@@ -282,6 +284,7 @@ function updatePlacesList() {
 
 
 function handleMapFailure() {
+    viewmodelLoading.stopLoading();
     divLoadingText = document.getElementById("loading-text");
     divLoadingText.innerHTML = "<h1>An error occurred while attempting to geolocate you.<br>Please <a href=index.html>try again</a>.</h1>";
 }
