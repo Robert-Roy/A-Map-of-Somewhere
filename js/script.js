@@ -17,13 +17,15 @@ var viewmodelLoading = {
     active: false
 };
 viewmodelLoading.startLoading = function () {
+    // Binds ellipsesText observable to document and begins loading display
     this.active = true;
+    ko.applyBindings(viewmodelLoading);
     this.incrementEllipses(this.ellipsesText);
 };
 viewmodelLoading.stopLoading = function () {
+    // stops incrementing of ellipses by stopping the recursion loop
     this.active = false;
 }
-ko.applyBindings(viewmodelLoading);
 viewmodelLoading.incrementEllipses = function (observableEllipses) {
     // Accepts a KO observable input and increments it every half-second from "."
     // to ".." to "..."
@@ -32,7 +34,6 @@ viewmodelLoading.incrementEllipses = function (observableEllipses) {
     if (!this.active) {
         return;
     }
-    console.log("still alive");
     that = this;
     switch (observableEllipses()) {
         case "...":
@@ -48,6 +49,7 @@ viewmodelLoading.incrementEllipses = function (observableEllipses) {
             console.log("Error in showLoading().");
             break;
     }
+    //recurse
     var incrementEllipsesWithParameter = function () {
         that.incrementEllipses(observableEllipses);
     };
@@ -59,18 +61,19 @@ viewmodelLoading.incrementEllipses = function (observableEllipses) {
 // MAP SECTION
 //////////////////
 //////////////////
+//This currently functions quite well, but I would like to add the below improvements:
 //TODO Generate map based on url
 //IF no URL, generate map based on user's location
 
 var viewmodelMap = {
-    map: null,
+    map: null, //google map object
     mapsAPIActive: false,
     pendingGeolocation: false,
     geolocationError: false,
     successFunction: function () {}, // function called when a map is drawn
     failureFunction: function () {}, // function called when an error or timeout occurs that prevents map drawing
-    timeoutAfterMS: 10000,
-    startTime: null
+    timeoutAfterMS: 10000, // how long to wait for geolcation in milliseconds
+    startTime: null // needed to record timeout on geolocation. Is given a value later.
 }
 viewmodelMap.create = function () {
     // If asked to create itself without latitude and longitude set, it will attempt to use
@@ -132,14 +135,17 @@ viewmodelMap.create = function () {
 }
 viewmodelMap.getUserLocation = function () {
     var that = this;
+    // function to call if getcurrent position is successful
     var callSetLocation = function (position) {
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
         that.setLocation(latitude, longitude);
     }
+    // function to call if getcurrent position is not successful
     var callError = function () {
         that.errorGettingUserLocation();
     }
+    // if navigator supports geolocation
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(callSetLocation, callError);
     } else {
@@ -158,6 +164,7 @@ viewmodelMap.setLocation = function (latitude, longitude) {
     this.longitude = longitude;
 }
 viewmodelMap.drawMap = function () {
+    // google maps api drawing script
     this.map = new google.maps.Map(document.getElementById('map'), {
         center: {
             lat: this.latitude,
@@ -168,6 +175,14 @@ viewmodelMap.drawMap = function () {
     });
 
 }
+
+//////////////////
+//////////////////
+// PLACES SECTION
+//////////////////
+//////////////////
+//TODO: Yelp star polling
+
 
 var modelPlace = [];
 var viewmodelPlacesList = [];
@@ -188,12 +203,14 @@ function validLatLng(latitude, longitude) {
     return false;
 }
 function searchMap() {
-    mapLocation = new google.maps.LatLng(viewmodelMap.latitude, viewmodelMap.longitude);
+    // center of the map
+    var mapLocation = new google.maps.LatLng(viewmodelMap.latitude, viewmodelMap.longitude);
     var searchQuery = {
         location: mapLocation,
-        radius: 6000,
+        radius: 6000, //meters, max 50,000
         type: ['restaurant']
     }
+    // search for nearby places, call handlePlacesSearch with results
     service = new google.maps.places.PlacesService(viewmodelMap.map);
     service.nearbySearch(searchQuery, handlePlacesSearch);
 }
@@ -205,6 +222,7 @@ function handlePlacesSearch(results, status) {
             addInfoWindow(modelPlace[i]);
         }
         sortPlaces();
+        // TODO: Start searching for yelp reviews at this point
         updatePlacesList();
         for (var i = 0; i < modelPlace.length; i++) {
             addWindowOpeningClickListenerToElement(modelPlace[i].infoWindow, modelPlace[i].marker, viewmodelPlacesList[i]);
@@ -216,6 +234,7 @@ function handlePlacesSearch(results, status) {
     }
 }
 function createMarker(place) {
+    // adds a marker to a map with a place object from google maps api
     var marker = new google.maps.Marker({
         map: viewmodelMap.map,
         position: place.geometry.location,
@@ -224,29 +243,45 @@ function createMarker(place) {
     return marker;
 }
 function addInfoWindow(place) {
+    //infowindow = panel visible in google maps over a location
     var infowindow = new google.maps.InfoWindow();
     var infowindowContent = "";
-    infowindowContent = infowindowContent + '<h5 class="">' + place.name + "</h5>";
+    // add location name
+    infowindowContent = infowindowContent + '<h5>' + place.name + "</h5>";
+    // add whether location is open or closed
     if (place.opening_hours.open_now) {
         infowindowContent = infowindowContent + "<p>Open Now</p>";
     } else {
         infowindowContent = infowindowContent + "<p>Currently Closed</p>";
     }
+    // add address
     infowindowContent = infowindowContent + "<p>" + place.vicinity + "</p>";
+    // confirm text in infowindow
     infowindow.setContent(infowindowContent);
+    // save infowindow for easy access
     place.infoWindow = infowindow;
 }
+
+//TODO: improve comments below this point
+
+
+
+
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
-    clickableObject.addEventListener('click', function () {
-        console.log("I don't know, man");
+    var onEventFunction = function (event) {
         infoWindow.open(viewmodelMap.map, marker);
-    }, true);
+        event.preventDefault();
+    }
+    clickableObject.addEventListener('click', onEventFunction, false);
+    clickableObject.addEventListener('touchstart', onEventFunction, false);
     console.log(clickableObject);
 }
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
-    google.maps.event.addListener(marker, 'click', function () {
-        infoWindow.open(viewmodelMap.map, this);
-    });
+    var onEventFunction = function (event) {
+        infoWindow.open(viewmodelMap.map, marker);
+        event.preventDefault();
+    }
+    google.maps.event.addListener(marker, 'click', onEventFunction);
 }
 
 function sortPlaces() {
@@ -255,6 +290,8 @@ function sortPlaces() {
     });
 }
 function updatePlacesList() {
+    // find locationlist div in DOM, then add all places (modelPlace[i]) to
+    // the list as divs. Save div element identities to viewmodelPlacesList[i].
     var locationList = document.getElementById("location-list");
     for (var i = 0; i < modelPlace.length; i++) {
         var newLocationListItem = document.createElement("div");
@@ -265,16 +302,7 @@ function updatePlacesList() {
         hrElement.className = "no-margin";
         locationList.appendChild(hrElement);
     }
-
-//    var locationList = "";
-//    for (var i = 0; i < modelPlace.length; i++) {
-//        locationList = locationList + "<li>" + modelPlace[i].name + "</li>";
-//        locationList = locationList + '<hr class="no-margin">';
-//    }
-//    document.getElementById("location-list").innerHTML = locationList;
 }
-
-
 
 //////////////////
 //////////////////
@@ -302,10 +330,7 @@ function handleMapSuccess() {
 }
 
 viewmodelLoading.startLoading();
-viewmodelMap.successFunction = function () {
-    handleMapSuccess();
-}
-;
+viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
 
