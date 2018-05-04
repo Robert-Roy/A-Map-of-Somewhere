@@ -222,7 +222,7 @@ function handlePlacesSearch(results, status) {
             addInfoWindow(modelPlace[i]);
         }
         sortPlaces();
-        // TODO: Start searching for yelp reviews at this point
+        getFoursquareCategories();
         updatePlacesList();
         for (var i = 0; i < modelPlace.length; i++) {
             addWindowOpeningClickListenerToElement(modelPlace[i].infoWindow, modelPlace[i].marker, viewmodelPlacesList[i]);
@@ -232,6 +232,33 @@ function handlePlacesSearch(results, status) {
     } else {
         // TODO: Something went wrong with the search, handle it.
     }
+}
+function getFoursquareCategories() {
+    for (i = 0; i < modelPlace.length; i++) {
+        thisPlace = modelPlace[i];
+        var functionWithParameters = function () {
+            getFoursquareCategoriesForPlace(thisPlace);
+        }
+        setTimeout(functionWithParameters, 1);
+        i = 80;
+    }
+}
+function getFoursquareCategoriesForPlace(place) {
+    var formattedName = place.name.split(" ").join("_");
+    var queryString = "https://api.foursquare.com/v2/venues/search?" +
+            "ll=" + place.geometry.location.lat() + "," + place.geometry.location.lng() +
+            "&v=20161016" +
+            "&intent=match" + 
+            "&name=" + formattedName + 
+            "&categoryId = 4d4b7105d754a06374d81259" + 
+            "&radius = 25" + 
+            "&client_id=0SMJ3QFXL5JXI2IXI00LFUZR5D0PFMG1VZ1UTCOO1EQOBNKJ" +
+            "&client_secret=VMAB4B2CVE12CQIKZWEFQYYTDCMTCIULHQEI0RGEZMHS2X4P";
+    console.log(queryString);
+    var reply = jQuery.getJSON(queryString);
+    console.log(place);
+    console.log(formattedName);
+    console.log(reply);
 }
 function createMarker(place) {
     // adds a marker to a map with a place object from google maps api
@@ -249,10 +276,12 @@ function addInfoWindow(place) {
     // add location name
     infowindowContent = infowindowContent + '<h5>' + place.name + "</h5>";
     // add whether location is open or closed
-    if (place.opening_hours.open_now) {
-        infowindowContent = infowindowContent + "<p>Open Now</p>";
-    } else {
-        infowindowContent = infowindowContent + "<p>Currently Closed</p>";
+    if (place.opening_hours) { //sometimes opening hours are undefined.
+        if (place.opening_hours.open_now) {
+            infowindowContent = infowindowContent + "<p>Open Now</p>";
+        } else {
+            infowindowContent = infowindowContent + "<p>Currently Closed</p>";
+        }
     }
     // add address
     infowindowContent = infowindowContent + "<p>" + place.vicinity + "</p>";
