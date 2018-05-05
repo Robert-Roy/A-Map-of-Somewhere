@@ -235,12 +235,17 @@ function handlePlacesSearch(results, status) {
 }
 function getFoursquareCategories() {
     for (i = 0; i < modelPlace.length; i++) {
-        thisPlace = modelPlace[i];
+        var thisPlace = modelPlace[i];
+        console.log(thisPlace.name);
+        console.log(functionWithParameters);
         var functionWithParameters = function () {
-            getFoursquareCategoriesForPlace(thisPlace);
-        }
-        setTimeout(functionWithParameters, 1);
-        i = 80;
+            console.log(thisPlace.name);
+            //getFoursquareCategoriesForPlace(thisPlace);
+        };
+        // only two requests per second allowed. This solves the issue by slowly gathering data.
+        setTimeout(functionWithParameters, 10);
+        functionWithParameters = null;
+        //i = 80;
     }
 }
 function getFoursquareCategoriesForPlace(place) {
@@ -248,17 +253,49 @@ function getFoursquareCategoriesForPlace(place) {
     var queryString = "https://api.foursquare.com/v2/venues/search?" +
             "ll=" + place.geometry.location.lat() + "," + place.geometry.location.lng() +
             "&v=20161016" +
-            "&intent=match" + 
-            "&name=" + formattedName + 
-            "&categoryId = 4d4b7105d754a06374d81259" + 
-            "&radius = 25" + 
+            "&intent=match" +
+            "&name=" + formattedName +
+            "&categoryId = 4d4b7105d754a06374d81259" +
+            "&radius = 25" +
             "&client_id=0SMJ3QFXL5JXI2IXI00LFUZR5D0PFMG1VZ1UTCOO1EQOBNKJ" +
             "&client_secret=VMAB4B2CVE12CQIKZWEFQYYTDCMTCIULHQEI0RGEZMHS2X4P";
-    console.log(queryString);
-    var reply = jQuery.getJSON(queryString);
-    console.log(place);
-    console.log(formattedName);
-    console.log(reply);
+    var request = $.ajax({
+        method: "GET",
+        dataType: "json",
+        url: queryString
+    });
+    request.done(function (response) {
+        handleFoursquareResponse(response, place);
+    });
+}
+function getCategoryFromResponse(response) {
+    var categories = response.response.venues[0].categories;
+    var category = "unknown";
+    for (var i = 0; i < categories.length; i++) {
+        if (categories[i].primary) {
+            category = categories[i].name;
+        }
+    }
+    return category;
+}
+function appendFoursquareCategory(category, place) {
+    var divCategory = "<div class='category'>" +
+            category + "<br>" +
+            "<img src='images/foursquare.png' alt='Foursquare logo'/>" +
+            "</div>"
+    var newContent = place.infoWindow.content + divCategory;
+    place.infoWindow.setContent(newContent);
+}
+function handleFoursquareResponse(response, place) {
+    if (!response) {
+        // response is undefined, stop trying
+        return false;
+    } else if (response.meta.code !== 200) {
+        // response code is not a success
+        return false;
+    }
+    var category = getCategoryFromResponse(response);
+    appendFoursquareCategory(category, place)
 }
 function createMarker(place) {
     // adds a marker to a map with a place object from google maps api
@@ -303,7 +340,6 @@ function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObj
     }
     clickableObject.addEventListener('click', onEventFunction, false);
     clickableObject.addEventListener('touchstart', onEventFunction, false);
-    console.log(clickableObject);
 }
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
     var onEventFunction = function (event) {
