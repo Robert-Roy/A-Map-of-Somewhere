@@ -318,20 +318,26 @@ function addInfoWindow(place) {
 //TODO: improve comments below this point
 
 
-
+function markerClickEvent(infoWindow, marker){
+        infoWindow.open(viewmodelMap.map, marker);
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+        var stopBouncing = function(){
+            marker.setAnimation(null)
+        }
+        setTimeout(stopBouncing, 750);
+        event.preventDefault();
+}
 
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
-    var onEventFunction = function (event) {
-        infoWindow.open(viewmodelMap.map, marker);
-        event.preventDefault();
+    var onEventFunction = function () {
+        markerClickEvent(infoWindow, marker);
     }
     clickableObject.addEventListener('click', onEventFunction, false);
     clickableObject.addEventListener('touchstart', onEventFunction, false);
 }
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
-    var onEventFunction = function (event) {
-        infoWindow.open(viewmodelMap.map, marker);
-        event.preventDefault();
+    var onEventFunction = function () {
+        markerClickEvent(infoWindow, marker);
     }
     google.maps.event.addListener(marker, 'click', onEventFunction);
 }
