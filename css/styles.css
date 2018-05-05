@@ -38,7 +38,8 @@ body, html{
 }
 
 #hidden-column-left{
-    min-width:20em;
+    max-width: 80%;
+    min-width:16em;
     z-index: 2;
     width:15vw;
     height:100vh;
