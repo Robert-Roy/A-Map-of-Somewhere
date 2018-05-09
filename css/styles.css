@@ -77,8 +77,6 @@ body, html{
 #location-list-container{
     overflow-y: auto;
     height: 100%;
-}
-#location-list{
     font-size: medium;
     color:black;
     list-style-type: none;
@@ -92,4 +90,16 @@ body, html{
 #location-list>div{
     padding-top: .5em;
     padding-bottom:.5em;
+}
+#location-filter{
+    margin-left: 0;
+    margin-right: 0;
+    padding-bottom:.75em;
+    width:100%;
+}
+#location-filter-input-label{
+    width:30%;
+}
+#location-filter-input{
+    width:70%;
 }

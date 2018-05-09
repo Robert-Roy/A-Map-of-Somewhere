@@ -318,14 +318,14 @@ function addInfoWindow(place) {
 //TODO: improve comments below this point
 
 
-function markerClickEvent(infoWindow, marker){
-        infoWindow.open(viewmodelMap.map, marker);
-        marker.setAnimation(google.maps.Animation.BOUNCE);
-        var stopBouncing = function(){
-            marker.setAnimation(null)
-        }
-        setTimeout(stopBouncing, 750);
-        event.preventDefault();
+function markerClickEvent(infoWindow, marker) {
+    infoWindow.open(viewmodelMap.map, marker);
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    var stopBouncing = function () {
+        marker.setAnimation(null)
+    }
+    setTimeout(stopBouncing, 750);
+    event.preventDefault();
 }
 
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
@@ -351,6 +351,9 @@ function updatePlacesList() {
     // find locationlist div in DOM, then add all places (modelPlace[i]) to
     // the list as divs. Save div element identities to viewmodelPlacesList[i].
     var locationList = document.getElementById("location-list");
+    var hrElement = document.createElement("hr");
+    hrElement.className = "no-margin";
+    locationList.appendChild(hrElement);
     for (var i = 0; i < modelPlace.length; i++) {
         var newLocationListItem = document.createElement("div");
         newLocationListItem.innerHTML = modelPlace[i].name;
