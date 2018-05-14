@@ -5,6 +5,21 @@
 
 //////////////////
 //////////////////
+// OBSERVABLES
+//////////////////
+//////////////////
+
+var viewmodelObservables = {
+    observableEllipsesText: ko.observable('...'),
+    observableLocationFilter: ko.observable('')
+};
+ko.applyBindings({
+    ellipsesText: viewmodelObservables.observableEllipsesText,
+    locationFilter: viewmodelObservables.observableLocationFilter
+});
+
+//////////////////
+//////////////////
 // LOADING SECTION
 //////////////////
 //////////////////
@@ -13,13 +28,12 @@
 // repeatedly so the user knows the page hasn't frozen.
 
 var viewmodelLoading = {
-    ellipsesText: ko.observable('...'),
+    ellipsesText: viewmodelObservables.observableEllipsesText,
     active: false
 };
 viewmodelLoading.startLoading = function () {
     // Binds ellipsesText observable to document and begins loading display
     this.active = true;
-    ko.applyBindings(viewmodelLoading);
     this.incrementEllipses(this.ellipsesText);
 };
 viewmodelLoading.stopLoading = function () {
@@ -186,7 +200,7 @@ viewmodelMap.drawMap = function () {
 
 var modelPlace = [];
 var viewmodelPlacesList = [];
-
+        
 function activateMaps() {
     //callback from google maps activation
     viewmodelMap.mapsAPIActive = true;
@@ -389,7 +403,6 @@ function handleMapSuccess() {
     // draw locations on map
     setTimeout(searchMap, 2000);
 }
-
 viewmodelLoading.startLoading();
 viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleMapFailure;
