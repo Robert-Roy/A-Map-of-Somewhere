@@ -11,7 +11,7 @@
 
 var viewmodelObservables = {
     observableEllipsesText: ko.observable('...'),
-    observableLocationFilter: ko.observable('')
+    observableLocationFilter: ko.observable('boi')
 };
 ko.applyBindings({
     ellipsesText: viewmodelObservables.observableEllipsesText,
@@ -271,8 +271,11 @@ function getFoursquareCategories() {
     }
 }
 function getCategoryFromFoursquareResponse(response) {
-    var categories = response.response.venues[0].categories;
     var category = "unknown";
+    if(!response.response.venues[0]){
+        return category;
+    }
+    var categories = response.response.venues[0].categories;
     for (var i = 0; i < categories.length; i++) {
         if (categories[i].primary) {
             category = categories[i].name;
@@ -294,9 +297,12 @@ function handleFoursquareResponse(response, place) {
         return false;
     }
     var category = getCategoryFromFoursquareResponse(response);
+    // this causes a type error if venues length is zero (when no match is found)
+    // but since this is run
+    // on a separate thread from the main thread, it can be safely ignored.
     var venueID = response.response.venues[0].id;
     var foursquareLink = "http://foursquare.com/v/" + venueID;
-    appendFoursquareCategory(category, place, foursquareLink)
+    appendFoursquareCategory(category, place, foursquareLink);
 }
 function createMarker(place) {
     // adds a marker to a map with a place object from google maps api
@@ -379,6 +385,8 @@ function updatePlacesList() {
     }
 }
 
+
+
 //////////////////
 //////////////////
 // Active Section
@@ -408,7 +416,9 @@ viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
 
-
+viewmodelObservables.observableLocationFilter.subscribe(function(newText){
+    console.log(newText);
+})
 
 $(".hidden-column-left-hamburger").on('click touch', function () {
     $(this).parent().toggleClass("inactive");
