@@ -7,15 +7,16 @@ All rights reserved. Copyright Robert Roy 2017.
 */
 
 body, html{
-    height:100vh;
+    height:100%;
+    width:100%;
 }
 
 .max-height{
-    height:100vh;
+    height:100%;
 }
 
 .max-width{
-    width:100vw;
+    width:100%;
     padding:0;
     margin:0;
 }
@@ -42,7 +43,7 @@ body, html{
     min-width:16em;
     z-index: 2;
     width:15vw;
-    height:100vh;
+    height:100%;
     color:blue;
     background-color:grey;
     position:absolute;
@@ -76,7 +77,7 @@ body, html{
 }
 #location-list-container{
     overflow-y: auto;
-    height: 100%;
+    height: calc(100%-1em);
     font-size: medium;
     color:black;
     list-style-type: none;
@@ -90,6 +91,7 @@ body, html{
 #location-list>div{
     padding-top: .5em;
     padding-bottom:.5em;
+    cursor: pointer;
 }
 #location-filter{
     margin-left: 0;
@@ -102,4 +104,8 @@ body, html{
 }
 #location-filter-input{
     width:70%;
+}
+.crossed-through{
+    text-decoration: line-through;
+    color:darkgrey;
 }

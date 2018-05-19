@@ -11,7 +11,7 @@
 
 var viewmodelObservables = {
     observableEllipsesText: ko.observable('...'),
-    observableLocationFilter: ko.observable('boi')
+    observableLocationFilter: ko.observable('')
 };
 ko.applyBindings({
     ellipsesText: viewmodelObservables.observableEllipsesText,
@@ -200,7 +200,7 @@ viewmodelMap.drawMap = function () {
 
 var modelPlace = [];
 var viewmodelPlacesList = [];
-        
+
 function activateMaps() {
     //callback from google maps activation
     viewmodelMap.mapsAPIActive = true;
@@ -272,7 +272,7 @@ function getFoursquareCategories() {
 }
 function getCategoryFromFoursquareResponse(response) {
     var category = "unknown";
-    if(!response.response.venues[0]){
+    if (!response.response.venues[0]) {
         return category;
     }
     var categories = response.response.venues[0].categories;
@@ -416,8 +416,23 @@ viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
 
-viewmodelObservables.observableLocationFilter.subscribe(function(newText){
-    console.log(newText);
+viewmodelObservables.observableLocationFilter.subscribe(function (newText) {
+    newText = newText.toUpperCase();
+    for (var i = 0; i < modelPlace.length; i++) {
+        normalizedName = modelPlace[i].name.toUpperCase();
+        if (normalizedName.includes(newText)) {
+            modelPlace[i].marker.setVisible(true);
+            if (viewmodelPlacesList[i].classList.contains("crossed-through")) {
+                viewmodelPlacesList[i].classList.remove("crossed-through");
+            }
+        } else {
+            modelPlace[i].marker.setVisible(false);
+            viewmodelPlacesList[i].classList.add("crossed-through");
+            if (!viewmodelPlacesList[i].classList.contains("crossed-through")) {
+                viewmodelPlacesList[i].classList.add("crossed-through");
+            }
+        }
+    }
 })
 
 $(".hidden-column-left-hamburger").on('click touch', function () {
