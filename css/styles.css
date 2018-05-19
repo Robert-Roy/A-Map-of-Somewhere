@@ -1,111 +1,104 @@
-/*
-All rights reserved. Copyright Robert Roy 2017.
-*/
-/* 
-    Created on : Apr 9, 2018, 6:48:20 PM
-    Author     : Robert Roy <www.robertsworkspace.com>
-*/
-
-body, html{
-    height:100%;
-    width:100%;
+/* All rights reserved. Copyright Robert Roy 2017. */
+/* Created on : Apr 9, 2018, 6:48:20 PM Author : Robert Roy <www.robertsworkspace.com> */
+ body, html {
+     height: 100%;
+     width: 100%;
 }
-
-.max-height{
-    height:100%;
+ .max-height {
+     height: 100%;
 }
-
-.max-width{
-    width:100%;
-    padding:0;
-    margin:0;
+ .max-width {
+     width: 100%;
+     padding: 0;
+     margin: 0;
 }
-
-.no-margin{
-    margin:0;
+ .no-margin {
+     margin: 0;
 }
-
-.no-padding{
-    padding:0;
+ .no-padding {
+     padding: 0;
 }
-
-.loading-text-centered{
-    position:relative;
-    top:40vh;
+ .loading-text-centered {
+     position: relative;
+     top: 40vh;
 }
-
-.no-display{
-    display:none;
+ .no-display {
+     display: none;
 }
-
-#hidden-column-left{
-    max-width: 80%;
-    min-width:16em;
-    z-index: 2;
-    width:15vw;
-    height:100%;
-    color:blue;
-    background-color:grey;
-    position:absolute;
-    transition:transform 0.6s ease;
-    will-change:transform;
-    /*    -webkit-transform: translate(-100%, 0%);
-        transform:translate(-100%, 0%);*/
-    /*transition:transform .3s ease;*/
+ #hidden-column-left {
+     max-width: 80%;
+     min-width: 16em;
+     z-index: 2;
+     width: 15vw;
+     height: 100%;
+     color: blue;
+     background-color: grey;
+     position: absolute;
+     transition: transform 0.6s ease;
+     will-change: transform;
+    /* -webkit-transform: translate(-100%, 0%);
+     transform:translate(-100%, 0%);
+    */
+    /*transition:transform .3s ease;
+    */
+    ;
 }
-.hidden-column-left-hamburger{
-    width:3em;
-    height:3em;
-    left:100%;
-    position:absolute;
-    background-color:grey;
-    border-radius: 0 0 1em 0;
-    /*    -webkit-transform: translate(-100%, 0%);
-        transform:translate(-100%, 0%);*/
-    /*transition:transform .3s ease;*/
+ .hidden-column-left-hamburger {
+     width: 3em;
+     height: 3em;
+     left: 100%;
+     position: absolute;
+     background-color: grey;
+     border-radius: 0 0 1em 0;
+    /* -webkit-transform: translate(-100%, 0%);
+     transform:translate(-100%, 0%);
+    */
+    /*transition:transform .3s ease;
+    */
+    ;
 }
-.hamburger-image{
-    height:50%;
-    width:50%;
-    top:20%;
-    left:20%;
-    position: relative; 
+ .hamburger-image {
+     height: 50%;
+     width: 50%;
+     top: 20%;
+     left: 20%;
+     position: relative;
 }
-.inactive{
-    -webkit-transform: translatex(-100%);
-    transform:translatex(-100%);
+ .inactive {
+     -webkit-transform: translatex(-100%);
+     transform: translatex(-100%);
 }
-#location-list-container{
-    overflow-y: auto;
-    height: calc(100%-1em);
-    font-size: medium;
-    color:black;
-    list-style-type: none;
-    padding:0px;
-    margin: 0px;
-    margin-left:.5em;
-    margin-top:.25em;
-    margin-bottom:.25em;
-    margin-right:.5em;
+ #location-list-container {
+     overflow-y: auto;
+     height: calc(100%-1em);
+     font-size: medium;
+     color: black;
+     list-style-type: none;
+     padding: 0px;
+     margin: 0px;
+     margin-left: .5em;
+     margin-top: .25em;
+     margin-bottom: .25em;
+     margin-right: .5em;
 }
-#location-list>div{
-    padding-top: .5em;
-    padding-bottom:.5em;
-    cursor: pointer;
+ #location-list>div {
+     padding-top: .5em;
+     padding-bottom: .5em;
+     cursor: pointer;
 }
-#location-filter{
-    margin-left: 0;
-    margin-right: 0;
-    padding-bottom:.75em;
-    width:100%;
+ #location-filter {
+     margin-left: 0;
+     margin-right: 0;
+     padding-bottom: .75em;
+     width: 100%;
 }
-#location-filter-input-label{
-    width:30%;
+ #location-filter-input-label {
+     width: 30%;
 }
-#location-filter-input{
-    width:70%;
+ #location-filter-input {
+     width: 70%;
 }
-.crossed-through{
-    text-decoration: line-through;
-    color:darkgrey;
+ .crossed-through {
+     text-decoration: line-through;
+     color: darkgrey;
 }

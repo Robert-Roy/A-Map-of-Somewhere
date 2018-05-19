@@ -271,8 +271,10 @@ function getFoursquareCategories() {
     }
 }
 function getCategoryFromFoursquareResponse(response) {
+    // default category
     var category = "unknown";
     if (!response.response.venues[0]) {
+        // no venue recieved
         return category;
     }
     var categories = response.response.venues[0].categories;
@@ -344,6 +346,7 @@ function markerClickEvent(infoWindow, marker) {
     var stopBouncing = function () {
         marker.setAnimation(null)
     }
+    // bounces two times in this time.
     setTimeout(stopBouncing, 750);
     event.preventDefault();
 }
@@ -417,8 +420,13 @@ viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
 
 viewmodelObservables.observableLocationFilter.subscribe(function (newText) {
+    //this runs anytime the filter text input is changed
+    // normalize to caps
     newText = newText.toUpperCase();
+    // Compare input to place names. Cross through locations and hide their markers
+    // when no match, make visible and uncross when matched.
     for (var i = 0; i < modelPlace.length; i++) {
+        // normalize to caps
         normalizedName = modelPlace[i].name.toUpperCase();
         if (normalizedName.includes(newText)) {
             modelPlace[i].marker.setVisible(true);
