@@ -38,7 +38,7 @@ viewmodelLoading.startLoading = function() {
 viewmodelLoading.stopLoading = function() {
     // stops incrementing of ellipses by stopping the recursion loop
     this.active = false;
-}
+};
 viewmodelLoading.incrementEllipses = function(observableEllipses) {
     // Accepts a KO observable input and increments it every half-second from "."
     // to ".." to "..."
@@ -87,7 +87,7 @@ var viewmodelMap = {
     failureFunction: function() {}, // function called when an error or timeout occurs that prevents map drawing
     timeoutAfterMS: 10000, // how long to wait for geolcation in milliseconds
     startTime: null // needed to record timeout on geolocation. Is given a value later.
-}
+};
 viewmodelMap.create = function() {
     // If asked to create itself without latitude and longitude set, it will attempt to use
     // geolocation to do so. If latitude and longitude are set, it will use those
@@ -100,7 +100,7 @@ viewmodelMap.create = function() {
     var that = this;
     var recurse = function() {
         that.create();
-    }
+    };
 
     // verify that google maps api is active
     if (!this.mapsAPIActive) {
@@ -145,7 +145,7 @@ viewmodelMap.create = function() {
     // wait 1/10th of a second and check again
     setTimeout(recurse, 100);
     return;
-}
+};
 viewmodelMap.getUserLocation = function() {
     var that = this;
     // function to call if getcurrent position is successful
@@ -153,11 +153,11 @@ viewmodelMap.getUserLocation = function() {
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
         that.setLocation(latitude, longitude);
-    }
+    };
     // function to call if getcurrent position is not successful
     var callError = function() {
         that.errorGettingUserLocation();
-    }
+    };
     // if navigator supports geolocation
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(callSetLocation, callError);
@@ -166,16 +166,16 @@ viewmodelMap.getUserLocation = function() {
         viewmodelMap.errorGettingUserLocation();
     }
 
-}
+};
 viewmodelMap.errorGettingUserLocation = function() {
     console.log("Unable to geolocate user.");
     this.geolocationError = true;
     this.failureFunction();
-}
+};
 viewmodelMap.setLocation = function(latitude, longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
-}
+};
 viewmodelMap.drawMap = function() {
     // google maps api drawing script
     this.map = new google.maps.Map(document.getElementById('map'), {
@@ -187,7 +187,7 @@ viewmodelMap.drawMap = function() {
         mapTypeControl: false
     });
 
-}
+};
 
 //////////////////
 //////////////////
@@ -224,7 +224,7 @@ function searchMap() {
         location: mapLocation,
         radius: 6000, //meters, max 50,000
         type: ['restaurant']
-    }
+    };
     // search for nearby places, call handlePlacesSearch with results
     service = new google.maps.places.PlacesService(viewmodelMap.map);
     service.nearbySearch(searchQuery, handlePlacesSearch);
@@ -240,9 +240,9 @@ function handlePlacesSearch(results, status) {
         sortPlaces();
         getFoursquareCategories();
         updatePlacesList();
-        for (var i = 0; i < modelPlace.length; i++) {
-            addWindowOpeningClickListenerToElement(modelPlace[i].infoWindow, modelPlace[i].marker, viewmodelPlacesList[i]);
-            addWindowOpeningClickListenerToMarker(modelPlace[i].infoWindow, modelPlace[i].marker);
+        for (var a = 0; a < modelPlace.length; a++) {
+            addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, viewmodelPlacesList[a]);
+            addWindowOpeningClickListenerToMarker(modelPlace[a].infoWindow, modelPlace[a].marker);
         }
 
     } else {
@@ -251,7 +251,7 @@ function handlePlacesSearch(results, status) {
 }
 
 function getFoursquareCategories() {
-    for (i = 0; i < modelPlace.length; i++) {
+    for (var i = 0; i < modelPlace.length; i++) {
         let thisPlace = modelPlace[i];
         var formattedName = thisPlace.name.split(" ").join("_");
         var queryString = "https://api.foursquare.com/v2/venues/search?" +
@@ -291,7 +291,7 @@ function getCategoryFromFoursquareResponse(response) {
 }
 
 function appendFoursquareCategory(category, place, link) {
-    var divCategory = "<p>" + category + " (according to <a href='" + link + "'>Foursquare</a>)</p>"
+    var divCategory = "<p>" + category + " (according to <a href='" + link + "'>Foursquare</a>)</p>";
     var newContent = place.infoWindow.content + divCategory;
     place.infoWindow.setContent(newContent);
 }
@@ -352,8 +352,8 @@ function markerClickEvent(infoWindow, marker) {
     infoWindow.open(viewmodelMap.map, marker);
     marker.setAnimation(google.maps.Animation.BOUNCE);
     var stopBouncing = function() {
-        marker.setAnimation(null)
-    }
+        marker.setAnimation(null);
+    };
     // bounces two times in this time.
     setTimeout(stopBouncing, 750);
     event.preventDefault();
@@ -362,7 +362,7 @@ function markerClickEvent(infoWindow, marker) {
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
     var onEventFunction = function() {
         markerClickEvent(infoWindow, marker);
-    }
+    };
     clickableObject.addEventListener('click', onEventFunction, false);
     clickableObject.addEventListener('touchstart', onEventFunction, false);
 }
@@ -370,7 +370,7 @@ function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObj
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
     var onEventFunction = function() {
         markerClickEvent(infoWindow, marker);
-    }
+    };
     google.maps.event.addListener(marker, 'click', onEventFunction);
 }
 
@@ -392,7 +392,7 @@ function updatePlacesList() {
         newLocationListItem.innerHTML = modelPlace[i].name;
         viewmodelPlacesList.push(newLocationListItem);
         locationList.appendChild(newLocationListItem);
-        var hrElement = document.createElement("hr");
+        hrElement = document.createElement("hr");
         hrElement.className = "no-margin";
         locationList.appendChild(hrElement);
     }
@@ -449,7 +449,7 @@ viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
             }
         }
     }
-})
+});
 
 $(".hidden-column-left-hamburger").on('click touch', function() {
     $(this).parent().toggleClass("inactive");
