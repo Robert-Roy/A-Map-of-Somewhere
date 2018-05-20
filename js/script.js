@@ -44,10 +44,10 @@ viewmodelLoading.incrementEllipses = function(observableEllipses) {
     // to ".." to "..."
 
     // this will stop recursion if loading is no longer active.
-    if (!this.active) {
+    var that = this;
+    if (!that.active) {
         return;
     }
-    that = this;
     switch (observableEllipses()) {
         case "...":
             observableEllipses(".");
@@ -226,7 +226,7 @@ function searchMap() {
         type: ['restaurant']
     };
     // search for nearby places, call handlePlacesSearch with results
-    service = new google.maps.places.PlacesService(viewmodelMap.map);
+    var service = new google.maps.places.PlacesService(viewmodelMap.map);
     service.nearbySearch(searchQuery, handlePlacesSearch);
 }
 
@@ -406,18 +406,18 @@ function updatePlacesList() {
 
 function handleMapFailure() {
     viewmodelLoading.stopLoading();
-    divLoadingText = document.getElementById("loading-text");
+    var divLoadingText = document.getElementById("loading-text");
     divLoadingText.innerHTML = "<h1>An error occurred while attempting to geolocate you.<br>Please <a href=index.html>try again</a>.</h1>";
 }
 
 function handleMapSuccess() {
     // remove loading text and set map to forefront
     viewmodelLoading.stopLoading();
-    divLoadingText = document.getElementById("loading-text");
+    var divLoadingText = document.getElementById("loading-text");
     divLoadingText.outerHTML = "";
-    divMap = document.getElementById("map-column");
+    var divMap = document.getElementById("map-column");
     divMap.classList.remove("no-display");
-    divLeftColumn = document.getElementById("hidden-column-left");
+    var divLeftColumn = document.getElementById("hidden-column-left");
     divLeftColumn.classList.remove("no-display");
     // draw locations on map
     setTimeout(searchMap, 2000);
@@ -435,7 +435,7 @@ viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
     // when no match, make visible and uncross when matched.
     for (var i = 0; i < modelPlace.length; i++) {
         // normalize to caps
-        normalizedName = modelPlace[i].name.toUpperCase();
+        var normalizedName = modelPlace[i].name.toUpperCase();
         if (normalizedName.includes(newText)) {
             modelPlace[i].marker.setVisible(true);
             if (viewmodelPlacesList[i].classList.contains("crossed-through")) {
