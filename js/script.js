@@ -2,7 +2,6 @@
  * All rights reserved. Copyright Robert Roy 2017.
  */
 
-
 //////////////////
 //////////////////
 // OBSERVABLES
@@ -31,16 +30,16 @@ var viewmodelLoading = {
     ellipsesText: viewmodelObservables.observableEllipsesText,
     active: false
 };
-viewmodelLoading.startLoading = function () {
+viewmodelLoading.startLoading = function() {
     // Binds ellipsesText observable to document and begins loading display
     this.active = true;
     this.incrementEllipses(this.ellipsesText);
 };
-viewmodelLoading.stopLoading = function () {
+viewmodelLoading.stopLoading = function() {
     // stops incrementing of ellipses by stopping the recursion loop
     this.active = false;
 }
-viewmodelLoading.incrementEllipses = function (observableEllipses) {
+viewmodelLoading.incrementEllipses = function(observableEllipses) {
     // Accepts a KO observable input and increments it every half-second from "."
     // to ".." to "..."
 
@@ -64,7 +63,7 @@ viewmodelLoading.incrementEllipses = function (observableEllipses) {
             break;
     }
     //recurse
-    var incrementEllipsesWithParameter = function () {
+    var incrementEllipsesWithParameter = function() {
         that.incrementEllipses(observableEllipses);
     };
     setTimeout(incrementEllipsesWithParameter, 500);
@@ -84,12 +83,12 @@ var viewmodelMap = {
     mapsAPIActive: false,
     pendingGeolocation: false,
     geolocationError: false,
-    successFunction: function () {}, // function called when a map is drawn
-    failureFunction: function () {}, // function called when an error or timeout occurs that prevents map drawing
+    successFunction: function() {}, // function called when a map is drawn
+    failureFunction: function() {}, // function called when an error or timeout occurs that prevents map drawing
     timeoutAfterMS: 10000, // how long to wait for geolcation in milliseconds
     startTime: null // needed to record timeout on geolocation. Is given a value later.
 }
-viewmodelMap.create = function () {
+viewmodelMap.create = function() {
     // If asked to create itself without latitude and longitude set, it will attempt to use
     // geolocation to do so. If latitude and longitude are set, it will use those
     // 
@@ -99,7 +98,7 @@ viewmodelMap.create = function () {
         this.startTime = new Date().getTime();
     }
     var that = this;
-    var recurse = function () {
+    var recurse = function() {
         that.create();
     }
 
@@ -147,16 +146,16 @@ viewmodelMap.create = function () {
     setTimeout(recurse, 100);
     return;
 }
-viewmodelMap.getUserLocation = function () {
+viewmodelMap.getUserLocation = function() {
     var that = this;
     // function to call if getcurrent position is successful
-    var callSetLocation = function (position) {
+    var callSetLocation = function(position) {
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
         that.setLocation(latitude, longitude);
     }
     // function to call if getcurrent position is not successful
-    var callError = function () {
+    var callError = function() {
         that.errorGettingUserLocation();
     }
     // if navigator supports geolocation
@@ -168,16 +167,16 @@ viewmodelMap.getUserLocation = function () {
     }
 
 }
-viewmodelMap.errorGettingUserLocation = function () {
+viewmodelMap.errorGettingUserLocation = function() {
     console.log("Unable to geolocate user.");
     this.geolocationError = true;
     this.failureFunction();
 }
-viewmodelMap.setLocation = function (latitude, longitude) {
+viewmodelMap.setLocation = function(latitude, longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
 }
-viewmodelMap.drawMap = function () {
+viewmodelMap.drawMap = function() {
     // google maps api drawing script
     this.map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -205,6 +204,7 @@ function activateMaps() {
     //callback from google maps activation
     viewmodelMap.mapsAPIActive = true;
 }
+
 function validLatLng(latitude, longitude) {
     // verify that lat long are numbers
     if (typeof latitude === "number" && typeof longitude === "number") {
@@ -216,6 +216,7 @@ function validLatLng(latitude, longitude) {
     }
     return false;
 }
+
 function searchMap() {
     // center of the map
     var mapLocation = new google.maps.LatLng(viewmodelMap.latitude, viewmodelMap.longitude);
@@ -228,6 +229,7 @@ function searchMap() {
     service = new google.maps.places.PlacesService(viewmodelMap.map);
     service.nearbySearch(searchQuery, handlePlacesSearch);
 }
+
 function handlePlacesSearch(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
         for (var i = 0; i < results.length; i++) {
@@ -247,29 +249,31 @@ function handlePlacesSearch(results, status) {
         // TODO: Something went wrong with the search, handle it.
     }
 }
+
 function getFoursquareCategories() {
     for (i = 0; i < modelPlace.length; i++) {
         let thisPlace = modelPlace[i];
         var formattedName = thisPlace.name.split(" ").join("_");
         var queryString = "https://api.foursquare.com/v2/venues/search?" +
-                "ll=" + thisPlace.geometry.location.lat() + "," + thisPlace.geometry.location.lng() +
-                "&v=20161016" +
-                "&intent=match" +
-                "&name=" + formattedName +
-                "&categoryId = 4d4b7105d754a06374d81259" +
-                "&radius = 25" +
-                "&client_id=0SMJ3QFXL5JXI2IXI00LFUZR5D0PFMG1VZ1UTCOO1EQOBNKJ" +
-                "&client_secret=VMAB4B2CVE12CQIKZWEFQYYTDCMTCIULHQEI0RGEZMHS2X4P";
+            "ll=" + thisPlace.geometry.location.lat() + "," + thisPlace.geometry.location.lng() +
+            "&v=20161016" +
+            "&intent=match" +
+            "&name=" + formattedName +
+            "&categoryId = 4d4b7105d754a06374d81259" +
+            "&radius = 25" +
+            "&client_id=0SMJ3QFXL5JXI2IXI00LFUZR5D0PFMG1VZ1UTCOO1EQOBNKJ" +
+            "&client_secret=VMAB4B2CVE12CQIKZWEFQYYTDCMTCIULHQEI0RGEZMHS2X4P";
         var request = $.ajax({
             method: "GET",
             dataType: "json",
             url: queryString
         });
-        request.done(function (response) {
+        request.done(function(response) {
             handleFoursquareResponse(response, thisPlace);
         });
     }
 }
+
 function getCategoryFromFoursquareResponse(response) {
     // default category
     var category = "unknown";
@@ -285,11 +289,13 @@ function getCategoryFromFoursquareResponse(response) {
     }
     return category;
 }
+
 function appendFoursquareCategory(category, place, link) {
     var divCategory = "<p>" + category + " (according to <a href='" + link + "'>Foursquare</a>)</p>"
     var newContent = place.infoWindow.content + divCategory;
     place.infoWindow.setContent(newContent);
 }
+
 function handleFoursquareResponse(response, place) {
     if (!response) {
         // response is undefined, stop trying
@@ -306,6 +312,7 @@ function handleFoursquareResponse(response, place) {
     var foursquareLink = "http://foursquare.com/v/" + venueID;
     appendFoursquareCategory(category, place, foursquareLink);
 }
+
 function createMarker(place) {
     // adds a marker to a map with a place object from google maps api
     var marker = new google.maps.Marker({
@@ -315,6 +322,7 @@ function createMarker(place) {
     });
     return marker;
 }
+
 function addInfoWindow(place) {
     //infowindow = panel visible in google maps over a location
     var infowindow = new google.maps.InfoWindow();
@@ -343,7 +351,7 @@ function addInfoWindow(place) {
 function markerClickEvent(infoWindow, marker) {
     infoWindow.open(viewmodelMap.map, marker);
     marker.setAnimation(google.maps.Animation.BOUNCE);
-    var stopBouncing = function () {
+    var stopBouncing = function() {
         marker.setAnimation(null)
     }
     // bounces two times in this time.
@@ -352,24 +360,26 @@ function markerClickEvent(infoWindow, marker) {
 }
 
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
-    var onEventFunction = function () {
+    var onEventFunction = function() {
         markerClickEvent(infoWindow, marker);
     }
     clickableObject.addEventListener('click', onEventFunction, false);
     clickableObject.addEventListener('touchstart', onEventFunction, false);
 }
+
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
-    var onEventFunction = function () {
+    var onEventFunction = function() {
         markerClickEvent(infoWindow, marker);
     }
     google.maps.event.addListener(marker, 'click', onEventFunction);
 }
 
 function sortPlaces() {
-    modelPlace.sort(function (a, b) {
+    modelPlace.sort(function(a, b) {
         return a.name.localeCompare(b.name);
     });
 }
+
 function updatePlacesList() {
     // find locationlist div in DOM, then add all places (modelPlace[i]) to
     // the list as divs. Save div element identities to viewmodelPlacesList[i].
@@ -388,20 +398,18 @@ function updatePlacesList() {
     }
 }
 
-
-
 //////////////////
 //////////////////
 // Active Section
 //////////////////
 //////////////////
 
-
 function handleMapFailure() {
     viewmodelLoading.stopLoading();
     divLoadingText = document.getElementById("loading-text");
     divLoadingText.innerHTML = "<h1>An error occurred while attempting to geolocate you.<br>Please <a href=index.html>try again</a>.</h1>";
 }
+
 function handleMapSuccess() {
     // remove loading text and set map to forefront
     viewmodelLoading.stopLoading();
@@ -419,7 +427,7 @@ viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleMapFailure;
 viewmodelMap.create();
 
-viewmodelObservables.observableLocationFilter.subscribe(function (newText) {
+viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
     //this runs anytime the filter text input is changed
     // normalize to caps
     newText = newText.toUpperCase();
@@ -443,6 +451,6 @@ viewmodelObservables.observableLocationFilter.subscribe(function (newText) {
     }
 })
 
-$(".hidden-column-left-hamburger").on('click touch', function () {
+$(".hidden-column-left-hamburger").on('click touch', function() {
     $(this).parent().toggleClass("inactive");
 });
