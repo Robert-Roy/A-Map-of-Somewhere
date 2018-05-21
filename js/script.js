@@ -291,18 +291,27 @@ function appendFoursquareCategory(category, place, link) {
     place.infoWindow.setContent(newContent);
 }
 
+function appendFoursquareNoMatchError(place){
+    console.log("Could not find match for " + place.name + " on Foursquare.");
+    var divCategory = "<p>Unable to find this location on Foursquare</p>";
+    var newContent = place.infoWindow.content + divCategory;
+    place.infoWindow.setContent(newContent);
+}
+
 function handleFoursquareResponse(response, place) {
     if (!response) {
         // response is undefined, stop trying
-        return false;
+        return;
     } else if (response.meta.code !== 200) {
         // response code is not a success
-        return false;
+        return;
     }
     var category = getCategoryFromFoursquareResponse(response);
-    // this causes a type error if venues length is zero (when no match is found)
-    // but since this is run
-    // on a separate thread from the main thread, it can be safely ignored.
+    if(category === "unknown"){
+        // no match found, category unknown
+        appendFoursquareNoMatchError(place);
+        return;
+    }
     var venueID = response.response.venues[0].id;
     var foursquareLink = "http://foursquare.com/v/" + venueID;
     appendFoursquareCategory(category, place, foursquareLink);
@@ -351,7 +360,6 @@ function markerClickEvent(infoWindow, marker) {
     };
     // bounces two times in this time.
     setTimeout(stopBouncing, 750);
-    event.preventDefault();
 }
 
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
