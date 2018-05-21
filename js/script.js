@@ -266,7 +266,7 @@ function getFoursquareCategories() {
             handleFoursquareResponse(response, thisPlace);
         });
         request.fail(function(){
-            appendFoursquareNoMatchError(thisPlace)
+            appendFoursquareNoMatchError(thisPlace);
         });
     }
 }
