@@ -95,7 +95,6 @@ viewmodelMap.create = function() {
     // so I can recurse with a timeout while keeping "this" intact.
     var that = this;
     if (that.startTime === null) {
-        console.log("setting new startTime");
         that.startTime = new Date().getTime();
     }
     console.log("Waiting for user location. " + (this.startTime + this.timeoutAfterMS - new Date().getTime()) + "ms remaining");
@@ -227,7 +226,7 @@ function searchMap() {
 
 function handlePlacesSearch(results, status) {
     if (status == google.maps.places.PlacesServiceStatus.OK) {
-        for (var i = 0; i < results.length; i++) {
+        for (var i = 0, len = results.length; i < len; i++) {
             modelPlace.push(results[i]);
             modelPlace[i].marker = createMarker(modelPlace[i]);
             addInfoWindow(modelPlace[i]);
@@ -235,7 +234,7 @@ function handlePlacesSearch(results, status) {
         sortPlaces();
         getFoursquareCategories();
         updatePlacesList();
-        for (var a = 0; a < modelPlace.length; a++) {
+        for (var a = 0, len = modelPlace.length; a < len; a++) {
             addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, viewmodelPlacesList[a]);
             addWindowOpeningClickListenerToMarker(modelPlace[a].infoWindow, modelPlace[a].marker);
         }
@@ -246,7 +245,7 @@ function handlePlacesSearch(results, status) {
 }
 
 function getFoursquareCategories() {
-    for (var i = 0; i < modelPlace.length; i++) {
+    for (var i = 0, len = modelPlace.length; i < len; i++) {
         let thisPlace = modelPlace[i];
         var formattedName = thisPlace.name.split(" ").join("_");
         var queryString = "https://api.foursquare.com/v2/venues/search?" +
@@ -277,7 +276,7 @@ function getCategoryFromFoursquareResponse(response) {
         return category;
     }
     var categories = response.response.venues[0].categories;
-    for (var i = 0; i < categories.length; i++) {
+    for (var i = 0, len=categories.length; i < len; i++) {
         if (categories[i].primary) {
             category = categories[i].name;
         }
@@ -390,7 +389,7 @@ function updatePlacesList() {
     var hrElement = document.createElement("hr");
     hrElement.className = "no-margin";
     locationList.appendChild(hrElement);
-    for (var i = 0; i < modelPlace.length; i++) {
+    for (var i = 0, len=modelPlace.length; i < len; i++) {
         var newLocationListItem = document.createElement("div");
         newLocationListItem.innerHTML = modelPlace[i].name;
         viewmodelPlacesList.push(newLocationListItem);
@@ -442,7 +441,7 @@ viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
     newText = newText.toUpperCase();
     // Compare input to place names. Cross through locations and hide their markers
     // when no match, make visible and uncross when matched.
-    for (var i = 0; i < modelPlace.length; i++) {
+    for (var i = 0, len = modelPlace.length; i < len; i++) {
         // normalize to caps
         var normalizedName = modelPlace[i].name.toUpperCase();
         if (normalizedName.includes(newText)) {
