@@ -234,13 +234,13 @@ function handlePlacesSearch(results, status) {
         sortPlaces();
         getFoursquareCategories();
         updatePlacesList();
-        for (var a = 0, len = modelPlace.length; a < len; a++) {
+        for (var a = 0, len2 = modelPlace.length; a < len2; a++) {
             addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, viewmodelPlacesList[a]);
             addWindowOpeningClickListenerToMarker(modelPlace[a].infoWindow, modelPlace[a].marker);
         }
-
+        handlePlacesSuccess();
     } else {
-        // TODO: Something went wrong with the search, handle it.
+        handleFailure("An error occurred while attempting to search for nearby places.");
     }
 }
 
@@ -264,6 +264,9 @@ function getFoursquareCategories() {
         });
         request.done(function(response) {
             handleFoursquareResponse(response, thisPlace);
+        });
+        request.fail(function(){
+            appendFoursquareNoMatchError(thisPlace)
         });
     }
 }
@@ -406,13 +409,23 @@ function updatePlacesList() {
 //////////////////
 //////////////////
 
-function handleMapFailure() {
+function handleFailure(strError) {
     viewmodelLoading.stopLoading();
     var divLoadingText = document.getElementById("loading-text");
-    divLoadingText.innerHTML = "<h1>An error occurred while attempting to geolocate you.<br>Please <a href=index.html>try again</a>.</h1>";
+    divLoadingText.innerHTML = "<h1>" + strError + "<br>Please <a href=index.html>try again</a>.</h1>";
+}
+function handleGeolocationFailure(){
+    handleFailure("An error occurred while trying to Geolocate you.");
+}
+function handleMapFailure(){
+    handleFailure("An error occurred while trying to load the Google Maps API.");
+}
+function handleMapSuccess() {
+    // wait half a second, then search for places on the map.
+    searchMap();
 }
 
-function handleMapSuccess() {
+function handlePlacesSuccess(){
     // remove loading text and set map to forefront
     viewmodelLoading.stopLoading();
     var divLoadingText = document.getElementById("loading-text");
@@ -421,8 +434,6 @@ function handleMapSuccess() {
     divMap.classList.remove("no-display");
     var divLeftColumn = document.getElementById("hidden-column-left");
     divLeftColumn.classList.remove("no-display");
-    // draw locations on map
-    setTimeout(searchMap, 2000);
 }
 
 function activateMaps() {
@@ -433,7 +444,7 @@ function activateMaps() {
 
 viewmodelLoading.startLoading();
 viewmodelMap.successFunction = handleMapSuccess;
-viewmodelMap.failureFunction = handleMapFailure;
+viewmodelMap.failureFunction = handleGeolocationFailure;
 
 viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
     //this runs anytime the filter text input is changed
