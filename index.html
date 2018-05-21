@@ -12,7 +12,7 @@ All rights reserved. Copyright Robert Roy 2017.
     <script src="js/lib/jquery-3.3.1.min.js"></script>
     <script src="js/lib/knockout-3.4.2.js"></script>
     <script defer src="js/script.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk22YlIlQNnNOM93_oqrR4vy6cCnVCbpI&v=3&libraries=places&callback=activateMaps"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk22YlIlQNnNOM93_oqrR4vy6cCnVCbpI&v=3&libraries=places&callback=activateMaps" onerror="handleMapFailure()"></script>
 </head>
 <body>
     <div id="hidden-column-left" class="no-display inactive">

@@ -93,11 +93,17 @@ viewmodelMap.create = function() {
     // geolocation to do so. If latitude and longitude are set, it will use those
     // 
     // so I can recurse with a timeout while keeping "this" intact.
-    if (this.startTime === null) {
-        console.log("setting new startTime");
-        this.startTime = new Date().getTime();
-    }
     var that = this;
+    if (that.startTime === null) {
+        console.log("setting new startTime");
+        that.startTime = new Date().getTime();
+    }
+    console.log("Waiting for user location. " + (this.startTime + this.timeoutAfterMS - new Date().getTime()) + "ms remaining");
+    if (that.startTime + that.timeoutAfterMS < new Date().getTime()) {
+        console.log("It took too long to get the user's location.");
+        that.errorGettingUserLocation();
+        return;
+    }
     var recurse = function() {
         that.create();
     };
@@ -136,12 +142,6 @@ viewmodelMap.create = function() {
         return;
     }
     // Check if we have waited too long (timeoutAfterMS milliseconds). Throw error if we have.
-    console.log("Waiting for user location. " + (this.startTime + this.timeoutAfterMS - new Date().getTime()) + "ms remaining");
-    if (this.startTime + this.timeoutAfterMS < new Date().getTime()) {
-        console.log("It took too long to get the user's location.");
-        this.errorGettingUserLocation();
-        return;
-    }
     // wait 1/10th of a second and check again
     setTimeout(recurse, 100);
     return;
@@ -199,11 +199,6 @@ viewmodelMap.drawMap = function() {
 
 var modelPlace = [];
 var viewmodelPlacesList = [];
-
-function activateMaps() {
-    //callback from google maps activation
-    viewmodelMap.mapsAPIActive = true;
-}
 
 function validLatLng(latitude, longitude) {
     // verify that lat long are numbers
@@ -422,10 +417,16 @@ function handleMapSuccess() {
     // draw locations on map
     setTimeout(searchMap, 2000);
 }
+
+function activateMaps() {
+    //callback from google maps activation
+    viewmodelMap.mapsAPIActive = true;
+    viewmodelMap.create();
+}
+
 viewmodelLoading.startLoading();
 viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleMapFailure;
-viewmodelMap.create();
 
 viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
     //this runs anytime the filter text input is changed
