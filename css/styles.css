@@ -70,7 +70,7 @@
 }
  #location-list-container {
      overflow-y: auto;
-     height: calc(100%-1em);
+     height: calc(100% - 1em);
      font-size: medium;
      color: black;
      list-style-type: none;
