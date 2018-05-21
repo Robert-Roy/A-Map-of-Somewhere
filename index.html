@@ -19,23 +19,17 @@ All rights reserved. Copyright Robert Roy 2017.
         <div class="hidden-column-left-hamburger">
             <img class="hamburger-image" src="images/hamburger.png">
         </div>
-
         <div id="location-list-container">
             <div id="location-filter">
                 <label for="location-filter-input" id="location-list-filter-input-label">Filter:</label>
                 <input type="text" id="location-filter-input" data-bind="textInput: locationFilter" name="locations" />
             </div>
-            <div id="location-list">
-
-            </div>
+            <ul id="location-list" data-bind="foreach: location">
+                <li class="location-list-item" data-bind="text: name"></li>
+            </ul>
         </div>
     </div>
     <div class="container container-fluid max-height max-width no-margin no-padding">
-        <!--            <div class="row row-loading-text">
-                            <div class="col-md-12 text-center">
-                                <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>
-                            </div>
-                        </div>-->
         <div class="row max-height max-width no-margin no-padding">
             <div id="loading-text" class="col-md-12 text-center loading-text-centered">
                 <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>

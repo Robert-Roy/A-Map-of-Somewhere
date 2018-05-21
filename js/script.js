@@ -10,11 +10,13 @@
 
 var viewmodelObservables = {
     observableEllipsesText: ko.observable('...'),
-    observableLocationFilter: ko.observable('')
+    observableLocationFilter: ko.observable(''),
+    observableLocations: ko.observableArray()
 };
 ko.applyBindings({
     ellipsesText: viewmodelObservables.observableEllipsesText,
-    locationFilter: viewmodelObservables.observableLocationFilter
+    locationFilter: viewmodelObservables.observableLocationFilter,
+    location: viewmodelObservables.observableLocations
 });
 
 //////////////////
@@ -235,7 +237,7 @@ function handlePlacesSearch(results, status) {
         getFoursquareCategories();
         updatePlacesList();
         for (var a = 0, len2 = modelPlace.length; a < len2; a++) {
-            addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, viewmodelPlacesList[a]);
+            //addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, viewmodelPlacesList[a]);
             addWindowOpeningClickListenerToMarker(modelPlace[a].infoWindow, modelPlace[a].marker);
         }
         handlePlacesSuccess();
@@ -387,19 +389,26 @@ function sortPlaces() {
 
 function updatePlacesList() {
     // find locationlist div in DOM, then add all places (modelPlace[i]) to
-    // the list as divs. Save div element identities to viewmodelPlacesList[i].
-    var locationList = document.getElementById("location-list");
-    var hrElement = document.createElement("hr");
-    hrElement.className = "no-margin";
-    locationList.appendChild(hrElement);
-    for (var i = 0, len=modelPlace.length; i < len; i++) {
-        var newLocationListItem = document.createElement("div");
-        newLocationListItem.innerHTML = modelPlace[i].name;
-        viewmodelPlacesList.push(newLocationListItem);
-        locationList.appendChild(newLocationListItem);
-        hrElement = document.createElement("hr");
-        hrElement.className = "no-margin";
-        locationList.appendChild(hrElement);
+    // the list as divs. Save div element identities to viewmodelPlacesList[i].    
+ for (var i = 0, len=modelPlace.length; i < len; i++) {
+        viewmodelObservables.observableLocations.push({
+            name: modelPlace[i].name
+        });
+        console.log(viewmodelObservables.observableLocations());
+        
+    //
+    //OLD: 
+    //var locationList = document.getElementById("location-list");
+    //var hrElement = document.createElement("hr");
+    //hrElement.className = "no-margin";
+    //locationList.appendChild(hrElement);
+//        var newLocationListItem = document.createElement("div");
+//        newLocationListItem.innerHTML = modelPlace[i].name;
+//        viewmodelPlacesList.push(newLocationListItem);
+//        locationList.appendChild(newLocationListItem);
+//        hrElement = document.createElement("hr");
+//        hrElement.className = "no-margin";
+//        locationList.appendChild(hrElement);
     }
 }
 
