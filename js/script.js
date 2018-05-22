@@ -236,8 +236,12 @@ function handlePlacesSearch(results, status) {
         sortPlaces();
         getFoursquareCategories();
         updatePlacesList();
+        
+        //add onclick events to every clickable list item or place marker
+        var locationList = document.getElementById("location-list");
         for (var a = 0, len2 = modelPlace.length; a < len2; a++) {
-            //addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, viewmodelPlacesList[a]);
+            var thisListItem = locationList.getElementsByTagName("li")[a];
+            addWindowOpeningClickListenerToElement(modelPlace[a].infoWindow, modelPlace[a].marker, thisListItem);
             addWindowOpeningClickListenerToMarker(modelPlace[a].infoWindow, modelPlace[a].marker);
         }
         handlePlacesSuccess();
