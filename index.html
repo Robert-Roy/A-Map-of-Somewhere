@@ -3,42 +3,42 @@
 All rights reserved. Copyright Robert Roy 2017.
 -->
 <html>
-<head>
-    <title>A Map of Somewhere</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/styles.css">
-    <script src="js/lib/jquery-3.3.1.min.js"></script>
-    <script src="js/lib/knockout-3.4.2.js"></script>
-    <script defer src="js/script.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk22YlIlQNnNOM93_oqrR4vy6cCnVCbpI&v=3&libraries=places&callback=activateMaps" onerror="handleMapFailure()"></script>
-</head>
-<body>
-    <div id="hidden-column-left" class="no-display inactive">
-        <div class="hidden-column-left-hamburger">
-            <img class="hamburger-image" src="images/hamburger.png">
-        </div>
-        <div id="location-list-container">
-            <div id="location-filter">
-                <label for="location-filter-input" id="location-list-filter-input-label">Filter:</label>
-                <input type="text" id="location-filter-input" data-bind="textInput: locationFilter" name="locations" />
+    <head>
+        <title>A Map of Somewhere</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/styles.css">
+        <script src="js/lib/jquery-3.3.1.min.js"></script>
+        <script src="js/lib/knockout-3.4.2.js"></script>
+        <script defer src="js/script.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk22YlIlQNnNOM93_oqrR4vy6cCnVCbpI&v=3&libraries=places&callback=activateMaps" onerror="handleMapFailure()"></script>
+    </head>
+    <body>
+        <div id="hidden-column-left" class="no-display inactive">
+            <div class="hidden-column-left-hamburger">
+                <img class="hamburger-image" src="images/hamburger.png">
             </div>
-            <ul id="location-list" data-bind="foreach: location">
-                <li class="location-list-item" data-bind="text: name, visible: visibility"></li>
-            </ul>
-        </div>
-    </div>
-    <div class="container container-fluid max-height max-width no-margin no-padding">
-        <div class="row max-height max-width no-margin no-padding">
-            <div id="loading-text" class="col-md-12 text-center loading-text-centered">
-                <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>
-            </div>
-            <div id="map-column" class="col-md-12 max-height no-margin no-padding no-display">
-                <div id="map" class="max-height no-margin no-padding"></div>
+            <div id="location-list-container">
+                <div id="location-filter">
+                    <label for="location-filter-input" id="location-list-filter-input-label">Filter:</label>
+                    <input type="text" id="location-filter-input" data-bind="textInput: locationFilter" name="locations" />
+                </div>
+                <ul id="location-list" data-bind="foreach: location">
+                    <li class="location-list-item" data-bind="text: name, visible: visibility"></li>
+                </ul>
             </div>
         </div>
-    </div>
-</body>
+        <div class="container container-fluid max-height max-width no-margin no-padding">
+            <div class="row max-height max-width no-margin no-padding">
+                <div id="loading-text" class="col-md-12 text-center loading-text-centered">
+                    <h1>Generating Map<span id="ellipses" data-bind="text: ellipsesText"></span></h1>
+                </div>
+                <div id="map-column" class="col-md-12 max-height no-margin no-padding no-display">
+                    <div id="map" class="max-height no-margin no-padding"></div>
+                </div>
+            </div>
+        </div>
+    </body>
 
 </html>

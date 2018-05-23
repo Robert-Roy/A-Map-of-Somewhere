@@ -32,16 +32,16 @@ var viewmodelLoading = {
     ellipsesText: viewmodelObservables.observableEllipsesText,
     active: false
 };
-viewmodelLoading.startLoading = function() {
+viewmodelLoading.startLoading = function () {
     // Binds ellipsesText observable to document and begins loading display
     this.active = true;
     this.incrementEllipses(this.ellipsesText);
 };
-viewmodelLoading.stopLoading = function() {
+viewmodelLoading.stopLoading = function () {
     // stops incrementing of ellipses by stopping the recursion loop
     this.active = false;
 };
-viewmodelLoading.incrementEllipses = function(observableEllipses) {
+viewmodelLoading.incrementEllipses = function (observableEllipses) {
     // Accepts a KO observable input and increments it every half-second from "."
     // to ".." to "..."
 
@@ -65,7 +65,7 @@ viewmodelLoading.incrementEllipses = function(observableEllipses) {
             break;
     }
     //recurse
-    var incrementEllipsesWithParameter = function() {
+    var incrementEllipsesWithParameter = function () {
         that.incrementEllipses(observableEllipses);
     };
     setTimeout(incrementEllipsesWithParameter, 500);
@@ -85,12 +85,12 @@ var viewmodelMap = {
     mapsAPIActive: false,
     pendingGeolocation: false,
     geolocationError: false,
-    successFunction: function() {}, // function called when a map is drawn
-    failureFunction: function() {}, // function called when an error or timeout occurs that prevents map drawing
+    successFunction: function () {}, // function called when a map is drawn
+    failureFunction: function () {}, // function called when an error or timeout occurs that prevents map drawing
     timeoutAfterMS: 10000, // how long to wait for geolcation in milliseconds
     startTime: null // needed to record timeout on geolocation. Is given a value later.
 };
-viewmodelMap.create = function() {
+viewmodelMap.create = function () {
     // If asked to create itself without latitude and longitude set, it will attempt to use
     // geolocation to do so. If latitude and longitude are set, it will use those
     // 
@@ -105,7 +105,7 @@ viewmodelMap.create = function() {
         that.errorGettingUserLocation();
         return;
     }
-    var recurse = function() {
+    var recurse = function () {
         that.create();
     };
 
@@ -147,16 +147,16 @@ viewmodelMap.create = function() {
     setTimeout(recurse, 100);
     return;
 };
-viewmodelMap.getUserLocation = function() {
+viewmodelMap.getUserLocation = function () {
     var that = this;
     // function to call if getcurrent position is successful
-    var callSetLocation = function(position) {
+    var callSetLocation = function (position) {
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
         that.setLocation(latitude, longitude);
     };
     // function to call if getcurrent position is not successful
-    var callError = function() {
+    var callError = function () {
         that.errorGettingUserLocation();
     };
     // if navigator supports geolocation
@@ -168,16 +168,16 @@ viewmodelMap.getUserLocation = function() {
     }
 
 };
-viewmodelMap.errorGettingUserLocation = function() {
+viewmodelMap.errorGettingUserLocation = function () {
     console.log("Unable to geolocate user.");
     this.geolocationError = true;
     this.failureFunction();
 };
-viewmodelMap.setLocation = function(latitude, longitude) {
+viewmodelMap.setLocation = function (latitude, longitude) {
     this.latitude = latitude;
     this.longitude = longitude;
 };
-viewmodelMap.drawMap = function() {
+viewmodelMap.drawMap = function () {
     // google maps api drawing script
     this.map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -234,7 +234,7 @@ function handlePlacesSearch(results, status) {
         sortPlaces();
         getFoursquareCategories();
         updatePlacesList();
-        
+
         //add onclick events to every clickable list item or place marker
         var locationList = document.getElementById("location-list");
         for (var a = 0, len2 = modelPlace.length; a < len2; a++) {
@@ -253,23 +253,23 @@ function getFoursquareCategories() {
         let thisPlace = modelPlace[i];
         var formattedName = thisPlace.name.split(" ").join("_");
         var queryString = "https://api.foursquare.com/v2/venues/search?" +
-            "ll=" + thisPlace.geometry.location.lat() + "," + thisPlace.geometry.location.lng() +
-            "&v=20161016" +
-            "&intent=match" +
-            "&name=" + formattedName +
-            "&categoryId = 4d4b7105d754a06374d81259" +
-            "&radius = 25" +
-            "&client_id=0SMJ3QFXL5JXI2IXI00LFUZR5D0PFMG1VZ1UTCOO1EQOBNKJ" +
-            "&client_secret=VMAB4B2CVE12CQIKZWEFQYYTDCMTCIULHQEI0RGEZMHS2X4P";
+                "ll=" + thisPlace.geometry.location.lat() + "," + thisPlace.geometry.location.lng() +
+                "&v=20161016" +
+                "&intent=match" +
+                "&name=" + formattedName +
+                "&categoryId = 4d4b7105d754a06374d81259" +
+                "&radius = 25" +
+                "&client_id=0SMJ3QFXL5JXI2IXI00LFUZR5D0PFMG1VZ1UTCOO1EQOBNKJ" +
+                "&client_secret=VMAB4B2CVE12CQIKZWEFQYYTDCMTCIULHQEI0RGEZMHS2X4P";
         var request = $.ajax({
             method: "GET",
             dataType: "json",
             url: queryString
         });
-        request.done(function(response) {
+        request.done(function (response) {
             handleFoursquareResponse(response, thisPlace);
         });
-        request.fail(function(){
+        request.fail(function () {
             appendFoursquareNoMatchError(thisPlace);
         });
     }
@@ -283,7 +283,7 @@ function getCategoryFromFoursquareResponse(response) {
         return category;
     }
     var categories = response.response.venues[0].categories;
-    for (var i = 0, len=categories.length; i < len; i++) {
+    for (var i = 0, len = categories.length; i < len; i++) {
         if (categories[i].primary) {
             category = categories[i].name;
         }
@@ -297,7 +297,7 @@ function appendFoursquareCategory(category, place, link) {
     place.infoWindow.setContent(newContent);
 }
 
-function appendFoursquareNoMatchError(place){
+function appendFoursquareNoMatchError(place) {
     console.log("Could not find match for " + place.name + " on Foursquare.");
     var divCategory = "<p>Unable to find this location on Foursquare</p>";
     var newContent = place.infoWindow.content + divCategory;
@@ -313,7 +313,7 @@ function handleFoursquareResponse(response, place) {
         return;
     }
     var category = getCategoryFromFoursquareResponse(response);
-    if(category === "unknown"){
+    if (category === "unknown") {
         // no match found, category unknown
         appendFoursquareNoMatchError(place);
         return;
@@ -358,7 +358,7 @@ function addInfoWindow(place) {
 function markerClickEvent(infoWindow, marker) {
     infoWindow.open(viewmodelMap.map, marker);
     marker.setAnimation(google.maps.Animation.BOUNCE);
-    var stopBouncing = function() {
+    var stopBouncing = function () {
         marker.setAnimation(null);
     };
     // bounces two times in this time.
@@ -366,7 +366,7 @@ function markerClickEvent(infoWindow, marker) {
 }
 
 function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObject) {
-    var onEventFunction = function() {
+    var onEventFunction = function () {
         markerClickEvent(infoWindow, marker);
     };
     clickableObject.addEventListener('click', onEventFunction, false);
@@ -374,33 +374,33 @@ function addWindowOpeningClickListenerToElement(infoWindow, marker, clickableObj
 }
 
 function addWindowOpeningClickListenerToMarker(infoWindow, marker) {
-    var onEventFunction = function() {
+    var onEventFunction = function () {
         markerClickEvent(infoWindow, marker);
     };
     google.maps.event.addListener(marker, 'click', onEventFunction);
 }
 
 function sortPlaces() {
-    modelPlace.sort(function(a, b) {
+    modelPlace.sort(function (a, b) {
         return a.name.localeCompare(b.name);
     });
 }
 
-var placeListObject = function(name, newVisibility) {
+var placeListObject = function (name, newVisibility) {
     this.name = ko.observable(name);
     this.visibility = ko.observable(newVisibility);
 }
-placeListObject.prototype.setVisibility = function(newVisibility){
+placeListObject.prototype.setVisibility = function (newVisibility) {
     this.visibility(newVisibility);
 };
 
 function updatePlacesList() {
     // find locationlist div in DOM, then add all places (modelPlace[i]) to
     // the list as divs. Save div element identities to viewmodelPlacesList[i].    
- for (var i = 0, len=modelPlace.length; i < len; i++) {
+    for (var i = 0, len = modelPlace.length; i < len; i++) {
         viewmodelObservables.observableLocations.push(
-            new placeListObject(modelPlace[i].name, true)
-        );
+                new placeListObject(modelPlace[i].name, true)
+                );
     }
 }
 
@@ -415,10 +415,10 @@ function handleFailure(strError) {
     var divLoadingText = document.getElementById("loading-text");
     divLoadingText.innerHTML = "<h1>" + strError + "<br>Please <a href=index.html>try again</a>.</h1>";
 }
-function handleGeolocationFailure(){
+function handleGeolocationFailure() {
     handleFailure("An error occurred while trying to Geolocate you.");
 }
-function handleMapFailure(){
+function handleMapFailure() {
     handleFailure("An error occurred while trying to load the Google Maps API.");
 }
 function handleMapSuccess() {
@@ -426,7 +426,7 @@ function handleMapSuccess() {
     searchMap();
 }
 
-function handlePlacesSuccess(){
+function handlePlacesSuccess() {
     // remove loading text and set map to forefront
     viewmodelLoading.stopLoading();
     var divLoadingText = document.getElementById("loading-text");
@@ -447,7 +447,7 @@ viewmodelLoading.startLoading();
 viewmodelMap.successFunction = handleMapSuccess;
 viewmodelMap.failureFunction = handleGeolocationFailure;
 
-viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
+viewmodelObservables.observableLocationFilter.subscribe(function (newText) {
     //this runs anytime the filter text input is changed
     // normalize to caps
     newText = newText.toUpperCase();
@@ -466,6 +466,6 @@ viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
     }
 });
 
-$(".hidden-column-left-hamburger").on('click touch', function() {
+$(".hidden-column-left-hamburger").on('click touch', function () {
     $(this).parent().toggleClass("inactive");
 });
