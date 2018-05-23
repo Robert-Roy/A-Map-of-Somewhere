@@ -195,8 +195,6 @@ viewmodelMap.drawMap = function() {
 // PLACES SECTION
 //////////////////
 //////////////////
-//TODO: Yelp star polling
-
 
 var modelPlace = [];
 var viewmodelPlacesList = [];
@@ -357,9 +355,6 @@ function addInfoWindow(place) {
     place.infoWindow = infowindow;
 }
 
-//TODO: improve comments below this point
-
-
 function markerClickEvent(infoWindow, marker) {
     infoWindow.open(viewmodelMap.map, marker);
     marker.setAnimation(google.maps.Animation.BOUNCE);
@@ -391,28 +386,21 @@ function sortPlaces() {
     });
 }
 
+var placeListObject = function(name, newVisibility) {
+    this.name = ko.observable(name);
+    this.visibility = ko.observable(newVisibility);
+}
+placeListObject.prototype.setVisibility = function(newVisibility){
+    this.visibility(newVisibility);
+};
+
 function updatePlacesList() {
     // find locationlist div in DOM, then add all places (modelPlace[i]) to
     // the list as divs. Save div element identities to viewmodelPlacesList[i].    
  for (var i = 0, len=modelPlace.length; i < len; i++) {
-        viewmodelObservables.observableLocations.push({
-            name: modelPlace[i].name
-        });
-        console.log(viewmodelObservables.observableLocations());
-        
-    //
-    //OLD: 
-    //var locationList = document.getElementById("location-list");
-    //var hrElement = document.createElement("hr");
-    //hrElement.className = "no-margin";
-    //locationList.appendChild(hrElement);
-//        var newLocationListItem = document.createElement("div");
-//        newLocationListItem.innerHTML = modelPlace[i].name;
-//        viewmodelPlacesList.push(newLocationListItem);
-//        locationList.appendChild(newLocationListItem);
-//        hrElement = document.createElement("hr");
-//        hrElement.className = "no-margin";
-//        locationList.appendChild(hrElement);
+        viewmodelObservables.observableLocations.push(
+            new placeListObject(modelPlace[i].name, true)
+        );
     }
 }
 
@@ -470,15 +458,10 @@ viewmodelObservables.observableLocationFilter.subscribe(function(newText) {
         var normalizedName = modelPlace[i].name.toUpperCase();
         if (normalizedName.includes(newText)) {
             modelPlace[i].marker.setVisible(true);
-            if (viewmodelPlacesList[i].classList.contains("crossed-through")) {
-                viewmodelPlacesList[i].classList.remove("crossed-through");
-            }
+            viewmodelObservables.observableLocations()[i].setVisibility(true);
         } else {
             modelPlace[i].marker.setVisible(false);
-            viewmodelPlacesList[i].classList.add("crossed-through");
-            if (!viewmodelPlacesList[i].classList.contains("crossed-through")) {
-                viewmodelPlacesList[i].classList.add("crossed-through");
-            }
+            viewmodelObservables.observableLocations()[i].setVisibility(false);
         }
     }
 });

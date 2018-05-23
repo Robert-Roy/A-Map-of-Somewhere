@@ -25,7 +25,7 @@ All rights reserved. Copyright Robert Roy 2017.
                 <input type="text" id="location-filter-input" data-bind="textInput: locationFilter" name="locations" />
             </div>
             <ul id="location-list" data-bind="foreach: location">
-                <li class="location-list-item" data-bind="text: name"></li>
+                <li class="location-list-item" data-bind="text: name, visible: visibility"></li>
             </ul>
         </div>
     </div>
